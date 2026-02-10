@@ -9,28 +9,38 @@ class EmotionalInferenceService {
 
   Future<EmotionalState> inferEmotionalState() async {
     final patterns = await DatabaseService.instance.getRecentBehaviorPatterns(days: 3);
+    final emotionalNotes = await DatabaseService.instance.getRecentEmotionalNotes(days: 3);
     
     if (patterns.isEmpty) return EmotionalState.neutral;
 
     int totalOpenCount = 0;
     int lateNightCount = 0;
     int highSpeedCount = 0;
-    int longSessionCount = 0;
+    int shortSessionCount = 0;
+    int negativeNoteCount = 0;
+    List<int> sessionTimes = [];
 
     for (var pattern in patterns) {
       totalOpenCount += pattern.appOpenCount;
+      sessionTimes.add(pattern.screenTimeSeconds);
       if (pattern.timeOfDay == 'late_night') lateNightCount++;
       if (pattern.interactionSpeed > 5) highSpeedCount++;
-      if (pattern.screenTimeSeconds > 600) longSessionCount++;
+      if (pattern.screenTimeSeconds < 60) shortSessionCount++;
+    }
+    
+    for (var note in emotionalNotes) {
+      if (note.sentiment == 'negative') negativeNoteCount++;
     }
 
     double avgOpenCount = totalOpenCount / patterns.length;
+    double sessionVariance = _calculateVariance(sessionTimes.map((s) => s.toDouble()).toList());
 
-    if (avgOpenCount > 15 && lateNightCount > patterns.length * 0.7) {
+    if ((avgOpenCount > 15 && lateNightCount > patterns.length * 0.7) || negativeNoteCount >= 3) {
       return EmotionalState.distressed;
     }
     
-    if (avgOpenCount > 10 && highSpeedCount > patterns.length * 0.5) {
+    if ((avgOpenCount > 10 && highSpeedCount > patterns.length * 0.5) || 
+        (negativeNoteCount >= 2 && sessionVariance > 200)) {
       return EmotionalState.restless;
     }
     
@@ -38,34 +48,44 @@ class EmotionalInferenceService {
       return EmotionalState.stressed;
     }
     
-    if (avgOpenCount < 3 && longSessionCount < 2) {
+    if (avgOpenCount < 3 && shortSessionCount > patterns.length * 0.6) {
       return EmotionalState.lowEnergy;
     }
     
-    if (avgOpenCount >= 3 && avgOpenCount <= 6 && highSpeedCount < patterns.length * 0.3) {
+    if (avgOpenCount >= 3 && avgOpenCount <= 6 && highSpeedCount < patterns.length * 0.3 && sessionVariance < 200) {
       return EmotionalState.calm;
     }
 
     return EmotionalState.neutral;
   }
 
+  double _calculateVariance(List<double> values) {
+    if (values.isEmpty) return 0.0;
+    final mean = values.reduce((a, b) => a + b) / values.length;
+    final squaredDiffs = values.map((v) => (v - mean) * (v - mean));
+    return squaredDiffs.reduce((a, b) => a + b) / values.length;
+  }
+
   Future<EmotionalConfidence> calculateConfidence() async {
     final patterns = await DatabaseService.instance.getRecentBehaviorPatterns(days: 7);
-    final moods = await DatabaseService.instance.getMoodEntries(limit: 10);
+    final emotionalNotes = await DatabaseService.instance.getRecentEmotionalNotes(days: 7);
     
     List<String> signals = [];
     double confidenceScore = 0.0;
     
     if (patterns.length >= 5) {
       signals.add('consistent_behavior_pattern');
-      confidenceScore += 0.2;
+      confidenceScore += 0.15;
     }
     
-    if (moods.length >= 3) {
-      final lowMoodCount = moods.where((m) => m.moodScore <= 4).length;
-      if (lowMoodCount >= 2) {
-        signals.add('repeated_low_mood');
-        confidenceScore += 0.3;
+    if (emotionalNotes.length >= 3) {
+      signals.add('frequent_emotional_expression');
+      confidenceScore += 0.2;
+      
+      final negativeCount = emotionalNotes.where((n) => n.sentiment == 'negative').length;
+      if (negativeCount >= 2) {
+        signals.add('repeated_negative_sentiment');
+        confidenceScore += 0.25;
       }
     }
     
@@ -81,17 +101,42 @@ class EmotionalInferenceService {
       confidenceScore += 0.15;
     }
     
-    if (moods.isNotEmpty) {
-      final recentMoods = moods.take(5).toList();
-      final variance = _calculateVariance(recentMoods.map((m) => m.moodScore.toDouble()).toList());
-      if (variance > 6.0) {
-        signals.add('mood_instability');
+    if (patterns.isNotEmpty) {
+      final avgOpenCount = patterns.map((p) => p.appOpenCount).reduce((a, b) => a + b) / patterns.length;
+      if (avgOpenCount > 12) {
+        signals.add('elevated_app_usage');
+        confidenceScore += 0.15;
+      }
+      
+      final sessionTimes = patterns.map((p) => p.screenTimeSeconds).toList();
+      final variance = _calculateSessionVariance(sessionTimes);
+      if (variance > 200) {
+        signals.add('erratic_usage_pattern');
         confidenceScore += 0.15;
       }
     }
     
+    final weekendPatterns = patterns.where((p) => p.dayOfWeek == 'saturday' || p.dayOfWeek == 'sunday').toList();
+    final weekdayPatterns = patterns.where((p) => p.dayOfWeek != 'saturday' && p.dayOfWeek != 'sunday').toList();
+    
+    if (weekendPatterns.isNotEmpty && weekdayPatterns.isNotEmpty) {
+      final weekendAvg = weekendPatterns.map((p) => p.appOpenCount).reduce((a, b) => a + b) / weekendPatterns.length;
+      final weekdayAvg = weekdayPatterns.map((p) => p.appOpenCount).reduce((a, b) => a + b) / weekdayPatterns.length;
+      
+      if ((weekendAvg - weekdayAvg).abs() > 5) {
+        signals.add('weekend_weekday_behavior_shift');
+        confidenceScore += 0.1;
+      }
+    }
+    
+    final shortSessions = patterns.where((p) => p.screenTimeSeconds < 60).length;
+    if (shortSessions > patterns.length * 0.6) {
+      signals.add('frequent_brief_sessions');
+      confidenceScore += 0.1;
+    }
+    
     ConfidenceLevel level;
-    if (confidenceScore >= 0.7 && signals.length >= 4) {
+    if (confidenceScore >= 0.7 && signals.length >= 5) {
       level = ConfidenceLevel.high;
     } else if (confidenceScore >= 0.4 && signals.length >= 2) {
       level = ConfidenceLevel.medium;
@@ -108,11 +153,11 @@ class EmotionalInferenceService {
     );
   }
 
-  double _calculateVariance(List<double> values) {
-    if (values.isEmpty) return 0.0;
-    final mean = values.reduce((a, b) => a + b) / values.length;
-    final squaredDiffs = values.map((v) => (v - mean) * (v - mean));
-    return squaredDiffs.reduce((a, b) => a + b) / values.length;
+  double _calculateSessionVariance(List<int> sessions) {
+    if (sessions.isEmpty) return 0.0;
+    final mean = sessions.reduce((a, b) => a + b) / sessions.length;
+    final squaredDiffs = sessions.map((v) => (v - mean) * (v - mean));
+    return squaredDiffs.reduce((a, b) => a + b) / sessions.length;
   }
 
   String getStateDescription(EmotionalState state) {
@@ -148,23 +193,11 @@ class EmotionalInferenceService {
     
     switch (state) {
       case EmotionalState.restless:
-        return [
-          'Try listening to calming audio',
-          'Practice breathing exercises',
-          'Take a short walk outside'
-        ];
+        return ['Try listening to calming audio', 'Practice breathing exercises', 'Take a short walk outside'];
       case EmotionalState.stressed:
-        return [
-          'Consider visiting a calming location',
-          'Listen to relaxation audio',
-          'Try deep breathing for 5 minutes'
-        ];
+        return ['Consider visiting a calming location', 'Listen to relaxation audio', 'Try deep breathing for 5 minutes'];
       case EmotionalState.lowEnergy:
-        return [
-          'Get some fresh air',
-          'Light physical activity might help',
-          'Stay hydrated'
-        ];
+        return ['Get some fresh air', 'Light physical activity might help', 'Stay hydrated'];
       default:
         return ['Keep maintaining your routine'];
     }

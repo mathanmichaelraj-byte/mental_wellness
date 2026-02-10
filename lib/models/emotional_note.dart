@@ -3,12 +3,14 @@ class EmotionalNote {
   final String content;
   final DateTime createdAt;
   final DateTime expiresAt;
+  final String? sentiment; // 'positive', 'neutral', 'negative'
 
   EmotionalNote({
     this.id,
     required this.content,
     required this.createdAt,
     required this.expiresAt,
+    this.sentiment,
   });
 
   Map<String, dynamic> toMap() {
@@ -17,6 +19,7 @@ class EmotionalNote {
       'content': content,
       'createdAt': createdAt.toIso8601String(),
       'expiresAt': expiresAt.toIso8601String(),
+      'sentiment': sentiment,
     };
   }
 
@@ -26,6 +29,7 @@ class EmotionalNote {
       content: map['content'],
       createdAt: DateTime.parse(map['createdAt']),
       expiresAt: DateTime.parse(map['expiresAt']),
+      sentiment: map['sentiment'],
     );
   }
 }

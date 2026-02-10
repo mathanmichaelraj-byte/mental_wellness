@@ -1,6 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../models/mood_entry.dart';
 import '../models/emotional_note.dart';
 import '../models/behavior_pattern.dart';
 
@@ -29,20 +28,12 @@ class DatabaseService {
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE mood_entries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        moodScore INTEGER NOT NULL,
-        notes TEXT,
-        timestamp TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
       CREATE TABLE emotional_notes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         content TEXT NOT NULL,
         createdAt TEXT NOT NULL,
-        expiresAt TEXT NOT NULL
+        expiresAt TEXT NOT NULL,
+        sentiment TEXT
       )
     ''');
 
@@ -53,24 +44,12 @@ class DatabaseService {
         appOpenCount INTEGER NOT NULL,
         screenTimeSeconds INTEGER NOT NULL,
         timeOfDay TEXT NOT NULL,
-        interactionSpeed INTEGER NOT NULL
+        interactionSpeed INTEGER NOT NULL,
+        dayOfWeek TEXT NOT NULL,
+        sessionCount INTEGER NOT NULL,
+        featureUsed TEXT
       )
     ''');
-  }
-
-  Future<int> insertMoodEntry(MoodEntry entry) async {
-    final db = await database;
-    return await db.insert('mood_entries', entry.toMap());
-  }
-
-  Future<List<MoodEntry>> getMoodEntries({int? limit}) async {
-    final db = await database;
-    final result = await db.query(
-      'mood_entries',
-      orderBy: 'timestamp DESC',
-      limit: limit,
-    );
-    return result.map((map) => MoodEntry.fromMap(map)).toList();
   }
 
   Future<int> insertEmotionalNote(EmotionalNote note) async {
@@ -85,6 +64,18 @@ class DatabaseService {
       'emotional_notes',
       where: 'expiresAt > ?',
       whereArgs: [now],
+      orderBy: 'createdAt DESC',
+    );
+    return result.map((map) => EmotionalNote.fromMap(map)).toList();
+  }
+
+  Future<List<EmotionalNote>> getRecentEmotionalNotes({int days = 7}) async {
+    final db = await database;
+    final cutoff = DateTime.now().subtract(Duration(days: days)).toIso8601String();
+    final result = await db.query(
+      'emotional_notes',
+      where: 'createdAt > ?',
+      whereArgs: [cutoff],
       orderBy: 'createdAt DESC',
     );
     return result.map((map) => EmotionalNote.fromMap(map)).toList();

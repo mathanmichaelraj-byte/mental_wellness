@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+import '../services/database_service.dart';
+import '../models/emotional_note.dart';
+import '../utils/sentiment_analyzer.dart';
+
+class OptionalShareDialog {
+  static void show(BuildContext context) {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (!context.mounted) return;
+      
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => const _ShareDialog(),
+      );
+    });
+  }
+}
+
+class _ShareDialog extends StatefulWidget {
+  const _ShareDialog();
+
+  @override
+  State<_ShareDialog> createState() => _ShareDialogState();
+}
+
+class _ShareDialogState extends State<_ShareDialog> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitShare() async {
+    if (_controller.text.trim().isEmpty) return;
+
+    final sentiment = SentimentAnalyzer.analyze(_controller.text);
+    
+    final note = EmotionalNote(
+      content: _controller.text,
+      createdAt: DateTime.now(),
+      expiresAt: DateTime.now().add(const Duration(hours: 24)),
+      sentiment: sentiment,
+    );
+
+    await DatabaseService.instance.insertEmotionalNote(note);
+
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Thank you for sharing'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: const Text('How\'s your day?'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Feel free to share what\'s on your mind, or skip if you prefer.',
+            style: TextStyle(fontSize: 15),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'What\'s on your mind?',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Skip'),
+        ),
+        ElevatedButton(
+          onPressed: _submitShare,
+          child: const Text('Share'),
+        ),
+      ],
+    );
+  }
+}

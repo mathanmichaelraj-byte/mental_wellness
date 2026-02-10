@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/emotional_note.dart';
 import '../services/database_service.dart';
+import '../utils/sentiment_analyzer.dart';
 
 class EmotionalReleaseScreen extends StatefulWidget {
   const EmotionalReleaseScreen({super.key});
@@ -36,10 +37,13 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen> {
   Future<void> _saveNote() async {
     if (_controller.text.isEmpty) return;
 
+    final sentiment = SentimentAnalyzer.analyze(_controller.text);
+    
     final note = EmotionalNote(
       content: _controller.text,
       createdAt: DateTime.now(),
       expiresAt: DateTime.now().add(Duration(hours: _expiryHours)),
+      sentiment: sentiment,
     );
 
     await DatabaseService.instance.insertEmotionalNote(note);

@@ -19,10 +19,10 @@ class GradientCard extends StatelessWidget {
       padding: padding ?? const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: gradientColors ?? [AppTheme.primaryBlue, AppTheme.secondaryPurple],
+          colors: gradientColors ?? [AppTheme.primary, AppTheme.secondary],
         ),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [AppTheme.cardShadow],
+        boxShadow: [AppTheme.softShadow],
       ),
       child: child,
     );
@@ -171,7 +171,7 @@ class AnimatedIcon extends StatelessWidget {
                 gradient: LinearGradient(colors: gradientColors),
                 shape: BoxShape.circle,
               ),
-              child: Icon(this.icon, size: size * 0.5, color: Colors.white),
+              child: Icon(icon, size: size * 0.5, color: Colors.white),
             ),
           ),
         );

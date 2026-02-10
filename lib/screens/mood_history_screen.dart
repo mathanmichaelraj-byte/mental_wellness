@@ -24,6 +24,8 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
   }
 
   Future<void> _loadData() async {
+    setState(() => _loading = true);
+    
     final state = await EmotionalInferenceService.instance.inferEmotionalState();
     final confidence = await EmotionalInferenceService.instance.calculateConfidence();
     final patterns = await DatabaseService.instance.getRecentBehaviorPatterns(days: 7);
@@ -39,7 +41,16 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Emotional Analysis')),
+      appBar: AppBar(
+        title: const Text('Emotional Analysis'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadData,
+            tooltip: 'Refresh',
+          ),
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -121,7 +132,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Score: ${(_confidence!.score * 100).toStringAsFixed(0)}%',
+              'Score: ${(_confidence!.score * 100).toStringAsFixed(0)}% | Signals: ${_confidence!.signalCount}',
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 12),

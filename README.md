@@ -1,37 +1,21 @@
-# Mental Wellness & Location Support App
+# Mental Wellness App
 
-A Flutter-based mobile application for emotional support through passive behavioral tracking and location-based assistance.
+Flutter mobile app for emotional support through passive behavioral tracking.
 
-## Core Features
+## Features
 
-### 1. Automatic Emotional Tracking
-- **No manual mood input required**
-- Tracks app usage patterns automatically
-- Monitors time-of-day usage, frequency, session duration
-- Builds confidence over time with multiple signals
+- **Automatic Tracking** - No manual input, monitors usage patterns
+- **Confidence-Based Support** - Low/Medium/High confidence responses
+- **Location Finder** - Therapists, parks, meditation centers (OpenStreetMap)
+- **Calming Tools** - Audio therapy, breathing exercises, emotional notes
+- **Privacy First** - All data stored locally
 
-### 2. Confidence-Based Support
-- **Low Confidence**: Neutral calming responses
-- **Medium Confidence**: Wellness suggestions (audio, breathing, locations)
-- **High Confidence**: Medical guidance when 5+ consistent signals detected
+## Tech Stack
 
-### 3. OpenStreetMap Integration
-- Free OSM tiles (no API key needed)
-- External Google Maps for navigation
-- Nearby therapists, parks, meditation centers
-
-### 4. Calming Features
-- Audio therapy player
-- Emotional release notes (auto-delete)
-- Breathing exercises
-- Mood history visualization
-
-## Technology Stack
 - Flutter SDK
-- SQLite (local storage)
-- OpenStreetMap (flutter_map)
-- Geolocator (GPS)
-- Local notifications
+- SQLite
+- OpenStreetMap
+- Geolocator
 
 ## Setup
 
@@ -40,13 +24,22 @@ flutter pub get
 flutter run
 ```
 
-No API keys required. Works immediately.
+## Behavioral Signals
+
+- Usage frequency and patterns
+- Time-of-day (late night, morning, etc.)
+- Session duration and variance
+- Day-of-week patterns
+- Interaction speed
+- Sentiment analysis
 
 ## Privacy
-- All data stored locally
+
+- 100% local storage
 - No cloud sync
 - No background tracking
-- User always in control
+- User controls all data
 
 ## Disclaimer
-Educational tool only. Not for medical diagnosis. Consult professionals for mental health support.
+
+Educational tool only. Not for medical diagnosis.

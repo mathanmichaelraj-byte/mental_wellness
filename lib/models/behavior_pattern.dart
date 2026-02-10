@@ -5,6 +5,9 @@ class BehaviorPattern {
   final int screenTimeSeconds;
   final String timeOfDay;
   final int interactionSpeed;
+  final String dayOfWeek;
+  final int sessionCount;
+  final String? featureUsed;
 
   BehaviorPattern({
     this.id,
@@ -13,6 +16,9 @@ class BehaviorPattern {
     required this.screenTimeSeconds,
     required this.timeOfDay,
     required this.interactionSpeed,
+    required this.dayOfWeek,
+    required this.sessionCount,
+    this.featureUsed,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +29,9 @@ class BehaviorPattern {
       'screenTimeSeconds': screenTimeSeconds,
       'timeOfDay': timeOfDay,
       'interactionSpeed': interactionSpeed,
+      'dayOfWeek': dayOfWeek,
+      'sessionCount': sessionCount,
+      'featureUsed': featureUsed,
     };
   }
 
@@ -34,6 +43,9 @@ class BehaviorPattern {
       screenTimeSeconds: map['screenTimeSeconds'],
       timeOfDay: map['timeOfDay'],
       interactionSpeed: map['interactionSpeed'],
+      dayOfWeek: map['dayOfWeek'],
+      sessionCount: map['sessionCount'],
+      featureUsed: map['featureUsed'],
     );
   }
 }
