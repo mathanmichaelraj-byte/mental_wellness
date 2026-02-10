@@ -17,17 +17,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     {
       'title': 'Welcome to Mental Wellness',
       'description': 'Your personal companion for emotional well-being',
-      'icon': '🌟'
+      'icon': 'favorite'
     },
     {
       'title': 'Non-Intrusive Support',
       'description': 'We understand your emotions through gentle patterns, not questions',
-      'icon': '💙'
+      'icon': 'psychology'
     },
     {
       'title': 'Calming Resources',
       'description': 'Access soothing audio and nearby calming locations',
-      'icon': '🎵'
+      'icon': 'spa'
     },
   ];
 
@@ -59,7 +59,33 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(page['icon']!, style: const TextStyle(fontSize: 80)),
+                        TweenAnimationBuilder(
+                          tween: Tween<double>(begin: 0, end: 1),
+                          duration: const Duration(milliseconds: 800),
+                          builder: (context, double value, child) {
+                            return Opacity(
+                              opacity: value,
+                              child: Transform.scale(
+                                scale: value,
+                                child: Container(
+                                  width: 120,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [Colors.blue.shade300, Colors.purple.shade300],
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    _getIconData(page['icon']!),
+                                    size: 60,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                         const SizedBox(height: 40),
                         Text(
                           page['title']!,
@@ -114,5 +140,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
       ),
     );
+  }
+
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'favorite':
+        return Icons.favorite;
+      case 'psychology':
+        return Icons.psychology;
+      case 'spa':
+        return Icons.spa;
+      default:
+        return Icons.star;
+    }
   }
 }

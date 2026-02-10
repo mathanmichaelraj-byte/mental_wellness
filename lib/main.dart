@@ -4,6 +4,7 @@ import 'services/database_service.dart';
 import 'services/notification_service.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/home_screen.dart';
+import 'utils/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,10 +23,7 @@ class MentalWellnessApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mental Wellness',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
       home: const SplashScreen(),
     );
   }
@@ -51,12 +49,49 @@ class _SplashScreenState extends State<SplashScreen> {
     final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
     
     if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => onboardingComplete ? const HomeScreen() : const WelcomeScreen(),
-        ),
-      );
+      if (onboardingComplete) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+        );
+        _showOptionalPrompt();
+      }
     }
+  }
+
+  void _showOptionalPrompt() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Text('How\'s your day?'),
+            content: const Text(
+              'Feel free to share what\'s on your mind, or skip if you prefer.',
+              style: TextStyle(fontSize: 15),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Skip'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // User can optionally share - low confidence signal
+                },
+                child: const Text('Share'),
+              ),
+            ],
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -66,9 +101,28 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              '🌟',
-              style: TextStyle(fontSize: 80),
+            TweenAnimationBuilder(
+              tween: Tween<double>(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 1500),
+              builder: (context, double value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.scale(
+                    scale: value,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF5B9FED), Color(0xFFB39DDB)],
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.favorite, size: 50, color: Colors.white),
+                    ),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 24),
             const Text(
