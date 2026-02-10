@@ -115,7 +115,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen> {
             const Padding(
               padding: EdgeInsets.all(8),
               child: Text(
-                'Note: Add audio files to assets/audio/ folder\n(calm.mp3, breathing.mp3, nature.mp3)',
+                'Tip: Use headphones for the best calming audio experience\nTap any track to start your relax',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
