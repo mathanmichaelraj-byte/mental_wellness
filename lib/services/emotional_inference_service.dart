@@ -34,25 +34,34 @@ class EmotionalInferenceService {
 
     double avgOpenCount = totalOpenCount / patterns.length;
     double sessionVariance = _calculateVariance(sessionTimes.map((s) => s.toDouble()).toList());
+    double lateNightRatio = lateNightCount / patterns.length;
+    double highSpeedRatio = highSpeedCount / patterns.length;
+    double shortSessionRatio = shortSessionCount / patterns.length;
 
-    if ((avgOpenCount > 15 && lateNightCount > patterns.length * 0.7) || negativeNoteCount >= 3) {
+    // Distressed: High usage + late nights OR multiple negative notes
+    if ((avgOpenCount > 15 && lateNightRatio > 0.7) || negativeNoteCount >= 3) {
       return EmotionalState.distressed;
     }
     
-    if ((avgOpenCount > 10 && highSpeedCount > patterns.length * 0.5) || 
+    // Restless: High speed interactions OR negative notes with erratic behavior
+    if ((avgOpenCount > 10 && highSpeedRatio > 0.5) || 
         (negativeNoteCount >= 2 && sessionVariance > 200)) {
       return EmotionalState.restless;
     }
     
-    if (lateNightCount > patterns.length * 0.6 && avgOpenCount > 8) {
+    // Stressed: Consistent late nights with moderate usage
+    if (lateNightRatio > 0.6 && avgOpenCount > 8) {
       return EmotionalState.stressed;
     }
     
-    if (avgOpenCount < 3 && shortSessionCount > patterns.length * 0.6) {
+    // Low Energy: Low usage with many short sessions
+    if (avgOpenCount < 3 && shortSessionRatio > 0.6) {
       return EmotionalState.lowEnergy;
     }
     
-    if (avgOpenCount >= 3 && avgOpenCount <= 6 && highSpeedCount < patterns.length * 0.3 && sessionVariance < 200) {
+    // Calm: Moderate usage, low speed, stable patterns
+    if (avgOpenCount >= 3 && avgOpenCount <= 6 && 
+        highSpeedRatio < 0.3 && sessionVariance < 200) {
       return EmotionalState.calm;
     }
 
@@ -70,14 +79,26 @@ class EmotionalInferenceService {
     final patterns = await DatabaseService.instance.getRecentBehaviorPatterns(days: 7);
     final emotionalNotes = await DatabaseService.instance.getRecentEmotionalNotes(days: 7);
     
+    if (patterns.isEmpty) {
+      return EmotionalConfidence(
+        level: ConfidenceLevel.low,
+        score: 0.0,
+        signalCount: 0,
+        lastUpdated: DateTime.now(),
+        signals: [],
+      );
+    }
+    
     List<String> signals = [];
     double confidenceScore = 0.0;
     
+    // Signal 1: Consistent behavior pattern
     if (patterns.length >= 5) {
       signals.add('consistent_behavior_pattern');
       confidenceScore += 0.15;
     }
     
+    // Signal 2-3: Emotional expression
     if (emotionalNotes.length >= 3) {
       signals.add('frequent_emotional_expression');
       confidenceScore += 0.2;
@@ -89,33 +110,35 @@ class EmotionalInferenceService {
       }
     }
     
+    // Signal 4: Late night activity
     final lateNightPatterns = patterns.where((p) => p.timeOfDay == 'late_night').length;
     if (lateNightPatterns > patterns.length * 0.6) {
       signals.add('persistent_late_night_activity');
       confidenceScore += 0.2;
     }
     
+    // Signal 5: High frequency usage
     final highFrequency = patterns.where((p) => p.appOpenCount > 10).length;
     if (highFrequency > patterns.length * 0.5) {
       signals.add('high_frequency_usage');
       confidenceScore += 0.15;
     }
     
-    if (patterns.isNotEmpty) {
-      final avgOpenCount = patterns.map((p) => p.appOpenCount).reduce((a, b) => a + b) / patterns.length;
-      if (avgOpenCount > 12) {
-        signals.add('elevated_app_usage');
-        confidenceScore += 0.15;
-      }
-      
-      final sessionTimes = patterns.map((p) => p.screenTimeSeconds).toList();
-      final variance = _calculateSessionVariance(sessionTimes);
-      if (variance > 200) {
-        signals.add('erratic_usage_pattern');
-        confidenceScore += 0.15;
-      }
+    // Signal 6-7: Usage patterns
+    final avgOpenCount = patterns.map((p) => p.appOpenCount).reduce((a, b) => a + b) / patterns.length;
+    if (avgOpenCount > 12) {
+      signals.add('elevated_app_usage');
+      confidenceScore += 0.15;
     }
     
+    final sessionTimes = patterns.map((p) => p.screenTimeSeconds).toList();
+    final variance = _calculateSessionVariance(sessionTimes);
+    if (variance > 200) {
+      signals.add('erratic_usage_pattern');
+      confidenceScore += 0.15;
+    }
+    
+    // Signal 8: Weekend/weekday shift
     final weekendPatterns = patterns.where((p) => p.dayOfWeek == 'saturday' || p.dayOfWeek == 'sunday').toList();
     final weekdayPatterns = patterns.where((p) => p.dayOfWeek != 'saturday' && p.dayOfWeek != 'sunday').toList();
     
@@ -129,12 +152,14 @@ class EmotionalInferenceService {
       }
     }
     
+    // Signal 9: Frequent brief sessions
     final shortSessions = patterns.where((p) => p.screenTimeSeconds < 60).length;
     if (shortSessions > patterns.length * 0.6) {
       signals.add('frequent_brief_sessions');
       confidenceScore += 0.1;
     }
     
+    // Determine confidence level
     ConfidenceLevel level;
     if (confidenceScore >= 0.7 && signals.length >= 5) {
       level = ConfidenceLevel.high;

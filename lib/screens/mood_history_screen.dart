@@ -3,6 +3,7 @@ import '../services/emotional_inference_service.dart';
 import '../services/database_service.dart';
 import '../models/behavior_pattern.dart';
 import '../models/emotional_confidence.dart';
+import '../utils/app_theme.dart';
 
 class MoodHistoryScreen extends StatefulWidget {
   const MoodHistoryScreen({super.key});
@@ -11,16 +12,28 @@ class MoodHistoryScreen extends StatefulWidget {
   State<MoodHistoryScreen> createState() => _MoodHistoryScreenState();
 }
 
-class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
+class _MoodHistoryScreenState extends State<MoodHistoryScreen>
+    with SingleTickerProviderStateMixin {
   EmotionalState? _currentState;
   EmotionalConfidence? _confidence;
   List<BehaviorPattern> _patterns = [];
   bool _loading = true;
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -36,58 +49,171 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
       _patterns = patterns;
       _loading = false;
     });
+
+    _animationController.forward();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: const Text('Emotional Analysis'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
+            onPressed: () {
+              _animationController.reset();
+              _loadData();
+            },
             tooltip: 'Refresh',
           ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+          ? Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildCurrentStateCard(),
-                  const SizedBox(height: 20),
-                  _buildConfidenceCard(),
-                  const SizedBox(height: 20),
-                  _buildMetricsCard(),
-                  const SizedBox(height: 20),
-                  _buildPatternsCard(),
+                  CircularProgressIndicator(color: AppTheme.primary),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Analyzing your patterns...',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 14,
+                    ),
+                  ),
                 ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadData,
+              color: AppTheme.primary,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 24),
+                    _buildCurrentStateCard(),
+                    const SizedBox(height: 20),
+                    _buildConfidenceCard(),
+                    const SizedBox(height: 20),
+                    _buildMetricsCard(),
+                    const SizedBox(height: 20),
+                    _buildHowItWorksCard(),
+                  ],
+                ),
               ),
             ),
     );
   }
 
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Your Insights',
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Understanding your emotional patterns over time',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: AppTheme.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCurrentStateCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Current Emotional State',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    if (_currentState == null) return const SizedBox();
+
+    final stateColor = AppTheme.getStateColor(_currentState.toString());
+
+    return FadeTransition(
+      opacity: _animationController,
+      child: Container(
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              stateColor.withOpacity(0.15),
+              stateColor.withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: stateColor.withOpacity(0.3),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: stateColor.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
             ),
-            const SizedBox(height: 12),
-            Text(
-              _currentState != null
-                  ? EmotionalInferenceService.instance.getStateDescription(_currentState!)
-                  : 'Analyzing...',
-              style: const TextStyle(fontSize: 16),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [stateColor, stateColor.withOpacity(0.7)],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: stateColor.withOpacity(0.3),
+                    blurRadius: 12,
+                    spreadRadius: -4,
+                  ),
+                ],
+              ),
+              child: Icon(
+                _getStateIcon(_currentState!),
+                color: Colors.white,
+                size: 36,
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Current State',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSecondary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    EmotionalInferenceService.instance
+                        .getStateDescription(_currentState!),
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -98,9 +224,15 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
   Widget _buildConfidenceCard() {
     if (_confidence == null) return const SizedBox();
     
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    return FadeTransition(
+      opacity: _animationController,
+      child: Container(
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [AppTheme.softShadow],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -109,53 +241,124 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
               children: [
                 const Text(
                   'Confidence Level',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: _getConfidenceColor(_confidence!.level),
-                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      colors: [
+                        _getConfidenceColor(_confidence!.level),
+                        _getConfidenceColor(_confidence!.level).withOpacity(0.8),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _getConfidenceColor(_confidence!.level)
+                            .withOpacity(0.3),
+                        blurRadius: 12,
+                        spreadRadius: -4,
+                      ),
+                    ],
                   ),
                   child: Text(
                     _confidence!.level.name.toUpperCase(),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      letterSpacing: 0.8,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            LinearProgressIndicator(
-              value: _confidence!.score,
-              backgroundColor: Colors.grey.shade200,
-              color: _getConfidenceColor(_confidence!.level),
+            const SizedBox(height: 20),
+
+            // Progress bar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: _confidence!.score,
+                backgroundColor: AppTheme.background,
+                color: _getConfidenceColor(_confidence!.level),
+                minHeight: 12,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Score: ${(_confidence!.score * 100).toStringAsFixed(0)}% | Signals: ${_confidence!.signalCount}',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
             const SizedBox(height: 12),
+
+            // Score info
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${(_confidence!.score * 100).toStringAsFixed(0)}% confidence',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '${_confidence!.signalCount} signals',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Signals
             const Text(
-              'Detected Signals:',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              'Detected Signals',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
             ),
-            const SizedBox(height: 8),
-            ..._confidence!.signals.map((signal) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check_circle, size: 16, color: Colors.green),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          signal.replaceAll('_', ' ').toUpperCase(),
-                          style: const TextStyle(fontSize: 13),
+            const SizedBox(height: 14),
+
+            ..._confidence!.signals.map(
+              (signal) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.successGradient,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _formatSignal(signal),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          height: 1.4,
                         ),
                       ),
-                    ],
-                  ),
-                )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -164,22 +367,46 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
 
   Widget _buildMetricsCard() {
     if (_patterns.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+      return FadeTransition(
+        opacity: _animationController,
+        child: Container(
+          padding: const EdgeInsets.all(48),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [AppTheme.softShadow],
+          ),
           child: Column(
             children: [
-              Icon(Icons.analytics_outlined, size: 48, color: Colors.grey[400]),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.analytics_outlined,
+                  size: 48,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Building Your Profile',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
-                'Not enough data yet',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Use the app for a few days to see your patterns',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                'We need a few more days of data to show your behavioral patterns. Keep using the app!',
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
+                  height: 1.5,
+                ),
               ),
             ],
           ),
@@ -201,69 +428,177 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
     double lateNightPercent = (lateNightCount / _patterns.length) * 100;
     int avgScreenTime = totalScreenTime ~/ _patterns.length;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    return FadeTransition(
+      opacity: _animationController,
+      child: Container(
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [AppTheme.softShadow],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Behavioral Metrics (Last 7 Days)',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              'Last 7 Days',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildMetricRow('Average Daily Opens', avgOpens.toStringAsFixed(1)),
-            _buildMetricRow('Late Night Usage', '${lateNightPercent.toStringAsFixed(0)}%'),
-            _buildMetricRow('Avg Session Time', '${avgScreenTime}s'),
-            _buildMetricRow('Total Patterns', _patterns.length.toString()),
+            const SizedBox(height: 20),
+
+            _buildMetricRow(
+              'Daily App Opens',
+              avgOpens.toStringAsFixed(1),
+              Icons.phone_android,
+              AppTheme.primaryGradient,
+            ),
+            _buildMetricRow(
+              'Late Night Usage',
+              '${lateNightPercent.toStringAsFixed(0)}%',
+              Icons.nightlight_round,
+              AppTheme.warmthGradient,
+            ),
+            _buildMetricRow(
+              'Avg Session Time',
+              '${avgScreenTime}s',
+              Icons.timer,
+              AppTheme.breathingGradient,
+            ),
+            _buildMetricRow(
+              'Total Patterns',
+              _patterns.length.toString(),
+              Icons.insights,
+              AppTheme.successGradient,
+              isLast: true,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMetricRow(String label, String value) {
+  Widget _buildMetricRow(
+    String label,
+    String value,
+    IconData icon,
+    Gradient gradient, {
+    bool isLast = false,
+  }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[700])),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
           Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPatternsCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+  Widget _buildHowItWorksCard() {
+    return FadeTransition(
+      opacity: _animationController,
+      child: Container(
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.primary.withOpacity(0.1),
+              AppTheme.success.withOpacity(0.05),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: AppTheme.primary.withOpacity(0.2),
+          ),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'How We Calculate',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.help_outline,
+                    color: AppTheme.primary,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Text(
+                  'How We Calculate',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            _buildCalculationStep('Track app usage patterns automatically'),
-            _buildCalculationStep('Analyze time-of-day and frequency'),
-            _buildCalculationStep('Calculate confidence from multiple signals'),
-            _buildCalculationStep('Infer emotional state from patterns'),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
+
+            _buildStep('Track app usage patterns automatically'),
+            _buildStep('Analyze time-of-day and frequency'),
+            _buildStep('Calculate confidence from multiple signals'),
+            _buildStep('Infer emotional state from patterns'),
+
+            const SizedBox(height: 20),
+
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.white.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: const Text(
-                'All analysis is done locally on your device. No data is sent anywhere.',
-                style: TextStyle(fontSize: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.lock_outline,
+                    color: AppTheme.success,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'All analysis is done locally on your device. No data is sent anywhere.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppTheme.textPrimary,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -272,27 +607,70 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen> {
     );
   }
 
-  Widget _buildCalculationStep(String text) {
+  Widget _buildStep(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.arrow_right, color: Colors.blue[400]),
-          const SizedBox(width: 8),
-          Expanded(child: Text(text)),
+          Container(
+            margin: const EdgeInsets.only(top: 2),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.arrow_forward,
+              size: 14,
+              color: AppTheme.primary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14, height: 1.5),
+            ),
+          ),
         ],
       ),
     );
   }
 
+  IconData _getStateIcon(EmotionalState state) {
+    switch (state) {
+      case EmotionalState.calm:
+        return Icons.self_improvement;
+      case EmotionalState.restless:
+        return Icons.trending_up;
+      case EmotionalState.stressed:
+        return Icons.warning_amber_rounded;
+      case EmotionalState.lowEnergy:
+        return Icons.battery_2_bar;
+      case EmotionalState.distressed:
+        return Icons.emergency;
+      default:
+        return Icons.sentiment_neutral;
+    }
+  }
+
   Color _getConfidenceColor(ConfidenceLevel level) {
     switch (level) {
       case ConfidenceLevel.low:
-        return Colors.grey;
+        return AppTheme.textSecondary;
       case ConfidenceLevel.medium:
-        return Colors.blue;
+        return AppTheme.success;
       case ConfidenceLevel.high:
-        return Colors.orange;
+        return AppTheme.warning;
     }
+  }
+
+  String _formatSignal(String signal) {
+    return signal
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
   }
 }

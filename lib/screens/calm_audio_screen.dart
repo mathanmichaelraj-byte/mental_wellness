@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/audio_service.dart';
+import '../utils/app_theme.dart';
 
 class CalmAudioScreen extends StatefulWidget {
   const CalmAudioScreen({super.key});
@@ -8,13 +9,25 @@ class CalmAudioScreen extends StatefulWidget {
   State<CalmAudioScreen> createState() => _CalmAudioScreenState();
 }
 
-class _CalmAudioScreenState extends State<CalmAudioScreen> {
+class _CalmAudioScreenState extends State<CalmAudioScreen> 
+    with SingleTickerProviderStateMixin {
   bool _isPlaying = false;
   String _currentTrack = '';
+  late AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
 
   @override
   void dispose() {
     AudioService.instance.stop();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -43,81 +56,126 @@ class _CalmAudioScreenState extends State<CalmAudioScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Calm Audio')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        title: const Text('Calm Audio'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (_currentTrack.isNotEmpty)
-              Card(
-                color: Colors.blue.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Now Playing: $_currentTrack',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
-                            iconSize: 48,
-                            onPressed: _isPlaying ? _pause : () => _playTrack(_currentTrack, AudioService.instance.playCalm),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.stop),
-                            iconSize: 48,
-                            onPressed: _stop,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+            // Header
+            Text(
+              'Find Your Peace',
+              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                fontWeight: FontWeight.w700,
               ),
-            const SizedBox(height: 24),
-            const Text(
-              'Choose a calming track',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Calming sounds to help you relax and center yourself',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppTheme.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Now Playing Card
+            if (_currentTrack.isNotEmpty) _buildNowPlayingCard(),
+
+            // Track Selection
+            Text(
+              'Choose a track',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 16),
-            Expanded(
-              child: ListView(
+
+            _buildTrackCard(
+              'Calm Meditation',
+              'Peaceful meditation sounds to quiet your mind',
+              Icons.self_improvement,
+              AppTheme.primaryGradient,
+              () => _playTrack('Calm Meditation', AudioService.instance.playCalm),
+            ),
+
+            _buildTrackCard(
+              'Breathing Guide',
+              'Guided breathing exercise for relaxation',
+              Icons.air,
+              AppTheme.breathingGradient,
+              () => _playTrack('Breathing Guide', AudioService.instance.playBreathing),
+            ),
+
+            _buildTrackCard(
+              'Nature Sounds',
+              'Relaxing natural ambience from peaceful settings',
+              Icons.nature,
+              AppTheme.successGradient,
+              () => _playTrack('Nature Sounds', AudioService.instance.playNature),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Tip Card
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.primary.withOpacity(0.1),
+                    AppTheme.success.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppTheme.primary.withOpacity(0.2),
+                ),
+              ),
+              child: Row(
                 children: [
-                  _buildTrackCard(
-                    'Calm Meditation',
-                    'Peaceful meditation sounds',
-                    Icons.self_improvement,
-                    Colors.blue,
-                    () => _playTrack('Calm Meditation', AudioService.instance.playCalm),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.headphones,
+                      color: AppTheme.primary,
+                      size: 24,
+                    ),
                   ),
-                  _buildTrackCard(
-                    'Breathing Guide',
-                    'Guided breathing exercise',
-                    Icons.air,
-                    Colors.teal,
-                    () => _playTrack('Breathing Guide', AudioService.instance.playBreathing),
-                  ),
-                  _buildTrackCard(
-                    'Nature Sounds',
-                    'Relaxing nature ambience',
-                    Icons.nature,
-                    Colors.green,
-                    () => _playTrack('Nature Sounds', AudioService.instance.playNature),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pro Tip',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Use headphones for the best calming experience',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppTheme.textSecondary,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(8),
-              child: Text(
-                'Tip: Use headphones for the best calming audio experience\nTap any track to start your relax',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-                textAlign: TextAlign.center,
               ),
             ),
           ],
@@ -126,19 +184,244 @@ class _CalmAudioScreenState extends State<CalmAudioScreen> {
     );
   }
 
-  Widget _buildTrackCard(String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color,
-          child: Icon(icon, color: Colors.white),
-        ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.play_circle_outline),
-        onTap: onTap,
+  Widget _buildNowPlayingCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 32),
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: AppTheme.calmGradient,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          AppTheme.softShadow,
+          BoxShadow(
+            color: AppTheme.primary.withOpacity(0.2),
+            blurRadius: 30,
+            spreadRadius: -5,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Pulsing icon
+          ScaleTransition(
+            scale: Tween<double>(begin: 0.95, end: 1.05).animate(
+              CurvedAnimation(
+                parent: _pulseController,
+                curve: Curves.easeInOut,
+              ),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _isPlaying ? Icons.music_note : Icons.pause,
+                size: 48,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Track name
+          Text(
+            'Now Playing',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white.withOpacity(0.9),
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _currentTrack,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+
+          // Controls
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildControlButton(
+                icon: _isPlaying ? Icons.pause : Icons.play_arrow,
+                onPressed: _isPlaying 
+                    ? _pause 
+                    : () => _playTrack(
+                        _currentTrack, 
+                        _getCurrentTrackFunction(),
+                      ),
+              ),
+              const SizedBox(width: 24),
+              _buildControlButton(
+                icon: Icons.stop,
+                onPressed: _stop,
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: IconButton(
+        icon: Icon(icon),
+        iconSize: 36,
+        color: AppTheme.primary,
+        onPressed: onPressed,
+        padding: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  Widget _buildTrackCard(
+    String title,
+    String description,
+    IconData icon,
+    Gradient gradient,
+    VoidCallback onTap,
+  ) {
+    final isCurrentTrack = _currentTrack == title;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isCurrentTrack 
+              ? AppTheme.primary.withOpacity(0.5)
+              : Colors.grey.shade200,
+          width: isCurrentTrack ? 2 : 1,
+        ),
+        boxShadow: [
+          if (isCurrentTrack)
+            BoxShadow(
+              color: AppTheme.primary.withOpacity(0.2),
+              blurRadius: 20,
+              spreadRadius: -5,
+            )
+          else
+            AppTheme.softShadow,
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                // Icon with gradient background
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: gradient,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: gradient.colors.first.withOpacity(0.3),
+                        blurRadius: 12,
+                        spreadRadius: -4,
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 20),
+
+                // Text content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppTheme.textSecondary,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Play icon
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isCurrentTrack && _isPlaying
+                        ? AppTheme.primary.withOpacity(0.1)
+                        : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isCurrentTrack && _isPlaying
+                        ? Icons.pause_circle_filled
+                        : Icons.play_circle_outline,
+                    color: isCurrentTrack 
+                        ? AppTheme.primary 
+                        : AppTheme.textSecondary,
+                    size: 32,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> Function() _getCurrentTrackFunction() {
+    switch (_currentTrack) {
+      case 'Calm Meditation':
+        return AudioService.instance.playCalm;
+      case 'Breathing Guide':
+        return AudioService.instance.playBreathing;
+      case 'Nature Sounds':
+        return AudioService.instance.playNature;
+      default:
+        return AudioService.instance.playCalm;
+    }
   }
 }

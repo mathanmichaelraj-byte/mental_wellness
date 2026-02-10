@@ -19,7 +19,7 @@ class GradientCard extends StatelessWidget {
       padding: padding ?? const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: gradientColors ?? [AppTheme.primary, AppTheme.secondary],
+          colors: gradientColors ?? [AppTheme.primary, AppTheme.background],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [AppTheme.softShadow],
