@@ -3,7 +3,6 @@ import '../services/emotional_inference_service.dart';
 import '../services/database_service.dart';
 import '../models/behavior_pattern.dart';
 import '../models/emotional_confidence.dart';
-import 'mood_tracking_screen.dart';
 import 'mood_history_screen.dart';
 import 'emotional_release_screen.dart';
 import 'location_finder_screen.dart';
@@ -46,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     } else if (state == AppLifecycleState.resumed) {
       _sessionStart = DateTime.now();
       _appOpenCount++;
+      _loadEmotionalState();
     }
   }
 
@@ -79,171 +79,277 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mental Wellness'),
-        centerTitle: true,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.blue.shade50, Colors.white],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  '🌟 Mental Wellness',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Your companion for emotional well-being',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 30),
+                if (_confidence != null && _confidence!.canEscalateToMedical() && !_medicalGuidanceDismissed)
+                  _buildMedicalGuidanceCard(),
+                _buildEmotionalStateCard(),
+                const SizedBox(height: 30),
+                const Text(
+                  'Wellness Tools',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                _buildFeatureGrid(),
+              ],
+            ),
+          ),
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_confidence != null && _confidence!.canEscalateToMedical() && !_medicalGuidanceDismissed)
-              Card(
-                color: Colors.orange.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.info_outline, color: Colors.orange),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text(
-                              'Important Notice',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close, size: 20),
-                            onPressed: () => setState(() => _medicalGuidanceDismissed = true),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Based on consistent patterns over time, you may benefit from professional support. This is not a diagnosis, but a suggestion based on observed patterns.',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const LocationFinderScreen()),
-                        ),
-                        icon: const Icon(Icons.location_on, size: 18),
-                        label: const Text('Find Professional Help'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+    );
+  }
+
+  Widget _buildMedicalGuidanceCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.orange.shade100, Colors.orange.shade50],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.info_outline, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Important Notice',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => setState(() => _medicalGuidanceDismissed = true),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Based on consistent patterns, you may benefit from professional support. This is not a diagnosis.',
+            style: TextStyle(fontSize: 15),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LocationFinderScreen()),
+            ),
+            icon: const Icon(Icons.location_on),
+            label: const Text('Find Professional Help'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmotionalStateCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            EmotionalInferenceService.instance.getStateDescription(_currentState),
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        if (_confidence != null)
-                          Chip(
-                            label: Text(
-                              _confidence!.level.name.toUpperCase(),
-                              style: const TextStyle(fontSize: 10),
-                            ),
-                            backgroundColor: _getConfidenceColor(_confidence!.level),
-                          ),
-                      ],
+                    Text(
+                      EmotionalInferenceService.instance.getStateDescription(_currentState),
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 12),
-                    ...EmotionalInferenceService.instance
-                        .getSuggestions(_currentState, _confidence?.level ?? ConfidenceLevel.low)
-                        .map((s) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text('• $s', style: const TextStyle(color: Colors.grey)),
-                            )),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Based on your patterns',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              children: [
-                _buildFeatureCard(
-                  'Track Mood',
-                  Icons.mood,
-                  Colors.blue,
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MoodTrackingScreen())),
+              if (_confidence != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _getConfidenceColor(_confidence!.level),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    _confidence!.level.name.toUpperCase(),
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
                 ),
-                _buildFeatureCard(
-                  'Mood History',
-                  Icons.history,
-                  Colors.green,
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MoodHistoryScreen())),
-                ),
-                _buildFeatureCard(
-                  'Emotional Release',
-                  Icons.edit_note,
-                  Colors.purple,
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EmotionalReleaseScreen())),
-                ),
-                _buildFeatureCard(
-                  'Calm Audio',
-                  Icons.music_note,
-                  Colors.orange,
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CalmAudioScreen())),
-                ),
-                _buildFeatureCard(
-                  'Find Calm Places',
-                  Icons.location_on,
-                  Colors.red,
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LocationFinderScreen())),
-                ),
-                _buildFeatureCard(
-                  'Breathing Exercise',
-                  Icons.air,
-                  Colors.teal,
-                  () => _showBreathingDialog(),
-                ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 12),
+          ...EmotionalInferenceService.instance
+              .getSuggestions(_currentState, _confidence?.level ?? ConfidenceLevel.low)
+              .map((s) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, size: 18, color: Colors.blue[400]),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(s, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                        ),
+                      ],
+                    ),
+                  )),
+        ],
       ),
+    );
+  }
+
+  Widget _buildFeatureGrid() {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      childAspectRatio: 1.1,
+      children: [
+        _buildFeatureCard(
+          'Mood History',
+          Icons.timeline,
+          [Colors.green.shade400, Colors.green.shade600],
+          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MoodHistoryScreen())),
+        ),
+        _buildFeatureCard(
+          'Emotional Release',
+          Icons.edit_note,
+          [Colors.purple.shade400, Colors.purple.shade600],
+          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EmotionalReleaseScreen())),
+        ),
+        _buildFeatureCard(
+          'Calm Audio',
+          Icons.music_note,
+          [Colors.orange.shade400, Colors.orange.shade600],
+          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CalmAudioScreen())),
+        ),
+        _buildFeatureCard(
+          'Find Calm Places',
+          Icons.location_on,
+          [Colors.red.shade400, Colors.red.shade600],
+          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LocationFinderScreen())),
+        ),
+        _buildFeatureCard(
+          'Breathing',
+          Icons.air,
+          [Colors.teal.shade400, Colors.teal.shade600],
+          () => _showBreathingDialog(),
+        ),
+      ],
     );
   }
 
   Color _getConfidenceColor(ConfidenceLevel level) {
     switch (level) {
       case ConfidenceLevel.low:
-        return Colors.grey.shade300;
+        return Colors.grey;
       case ConfidenceLevel.medium:
-        return Colors.blue.shade200;
+        return Colors.blue;
       case ConfidenceLevel.high:
-        return Colors.orange.shade300;
+        return Colors.orange;
     }
   }
 
-  Widget _buildFeatureCard(String title, IconData icon, Color color, VoidCallback onTap) {
-    return Card(
-      elevation: 2,
-      child: InkWell(
-        onTap: onTap,
+  Widget _buildFeatureCard(String title, IconData icon, List<Color> gradient, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: gradient,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: gradient[0].withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 48, color: color),
+            Icon(icon, size: 48, color: Colors.white),
             const SizedBox(height: 12),
-            Text(title, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 15,
+              ),
+            ),
           ],
         ),
       ),
@@ -254,8 +360,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Breathing Exercise'),
-        content: const Text('Breathe in for 4 seconds\nHold for 4 seconds\nBreathe out for 4 seconds\n\nRepeat 5 times'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.air, color: Colors.teal),
+            SizedBox(width: 8),
+            Text('Breathing Exercise'),
+          ],
+        ),
+        content: const Text(
+          'Breathe in for 4 seconds\nHold for 4 seconds\nBreathe out for 4 seconds\n\nRepeat 5 times',
+          style: TextStyle(fontSize: 16, height: 1.5),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
