@@ -8,9 +8,9 @@ class AppTheme {
   // ============================================================================
   
   /// Primary - Soft Indigo (Calm, Trust, Stability)
-  static const primary = Color(0xFF6366F1);
+  static const primary = Color.fromARGB(255, 99, 130, 241);
   static const primaryLight = Color(0xFFA5B4FC);
-  static const primaryDark = Color(0xFF4F46E5);
+  static const primaryDark = Color.fromARGB(255, 70, 81, 229);
   
   /// Secondary - Teal (Growth, Healing, Balance)
   static const secondary = Color(0xFF14B8A6);
@@ -167,7 +167,7 @@ class AppTheme {
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         titleTextStyle: TextStyle(
           fontFamily: 'Inter',
-          fontSize: 28,
+          fontSize: 24,
           fontWeight: FontWeight.w700,
           color: textPrimary,
           letterSpacing: -0.5,

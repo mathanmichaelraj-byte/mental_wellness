@@ -7,14 +7,17 @@ class AudioService {
   AudioService._init();
 
   Future<void> playCalm() async {
+    await _player.setReleaseMode(ReleaseMode.loop);
     await _player.play(AssetSource('audio/calm.mp3'));
   }
 
   Future<void> playBreathing() async {
-    await _player.play(AssetSource('audio/breathing.mp3'));
+    await _player.setReleaseMode(ReleaseMode.loop);
+    await _player.play(AssetSource('audio/rain.mp3'));
   }
 
   Future<void> playNature() async {
+    await _player.setReleaseMode(ReleaseMode.loop);
     await _player.play(AssetSource('audio/nature.mp3'));
   }
 

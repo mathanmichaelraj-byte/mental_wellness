@@ -104,11 +104,11 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
             ),
 
             _buildTrackCard(
-              'Breathing Guide',
-              'Guided breathing exercise for relaxation',
+              'Rain Noise',
+              'Raining Sound for relaxation',
               Icons.air,
               AppTheme.breathingGradient,
-              () => _playTrack('Breathing Guide', AudioService.instance.playBreathing),
+              () => _playTrack('Rain Noise', AudioService.instance.playBreathing),
             ),
 
             _buildTrackCard(
@@ -156,7 +156,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Pro Tip',
+                          'Tip:',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -416,7 +416,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
     switch (_currentTrack) {
       case 'Calm Meditation':
         return AudioService.instance.playCalm;
-      case 'Breathing Guide':
+      case 'Rain Noise':
         return AudioService.instance.playBreathing;
       case 'Nature Sounds':
         return AudioService.instance.playNature;

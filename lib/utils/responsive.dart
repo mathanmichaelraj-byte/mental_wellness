@@ -22,7 +22,7 @@ class Responsive {
   }
   
   // Responsive spacing
-  double spacing(double size) => wp(size / 3.75);
+  double spacing(double size) => wp(size / 2.75);
   
   // Check if tablet
   bool get isTablet => width >= 600;

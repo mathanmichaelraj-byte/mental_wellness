@@ -376,6 +376,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
     return FadeTransition(
       opacity: _fadeController,
       child: Container(
+        width: double.infinity,
         padding: const EdgeInsets.all(48),
         decoration: BoxDecoration(
           color: Colors.white,
