@@ -115,7 +115,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
 
     if (confirmed == true) {
       await DatabaseService.instance.deleteEmotionalNote(id);
-      _loadNotes();
+      await _loadNotes();
     }
   }
 

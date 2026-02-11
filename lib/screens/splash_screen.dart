@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'welcome_screen.dart';
 import 'home_screen.dart';
-import '../widgets/optional_share_dialog.dart';
 import '../utils/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -73,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen>
     
     if (mounted) {
       final targetScreen = onboardingComplete 
-          ? const HomeScreen() 
+          ? HomeScreen() 
           : const WelcomeScreen();
       
       await Navigator.of(context).pushReplacement(
@@ -96,12 +95,6 @@ class _SplashScreenState extends State<SplashScreen>
           transitionDuration: const Duration(milliseconds: 500),
         ),
       );
-      
-      // Show dialog after navigation completes
-      await Future.delayed(const Duration(milliseconds: 800));
-      if (mounted) {
-        OptionalShareDialog.show(context);
-      }
     }
   }
 

@@ -46,3 +46,9 @@ app.*.map.json
 /android/app/build
 /android/.gradle
 /android/build
+
+#Tflite (exclude training models, keep deployed models)
+*.h5
+*.pb
+training/
+*.tflite

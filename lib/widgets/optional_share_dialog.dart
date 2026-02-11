@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/database_service.dart';
 import '../models/emotional_note.dart';
 import '../utils/sentiment_analyzer.dart';
 
 class OptionalShareDialog {
-  static void show(BuildContext context) {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (!context.mounted) return;
+  static Future<void> show(BuildContext context, {bool autoShow = false}) async {
+    if (autoShow) {
+      final prefs = await SharedPreferences.getInstance();
+      final lastShown = prefs.getString('last_dialog_shown');
+      final today = DateTime.now().toIso8601String().split('T')[0];
       
-      showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => const _ShareDialog(),
-      );
-    });
+      if (lastShown == today) return;
+      await prefs.setString('last_dialog_shown', today);
+    }
+    
+    if (!context.mounted) return;
+    
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (!context.mounted) return;
+    
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const _ShareDialog(),
+    );
   }
 }
 

@@ -38,14 +38,23 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
 
   Future<void> _initializeMap() async {
     final position = await LocationService.instance.getCurrentLocation();
-    final places = LocationService.instance.getCalmingLocations();
     
     setState(() {
       _currentPosition = position;
-      _places = places;
-      _loading = false;
       _permissionDenied = position == null;
     });
+    
+    if (position != null) {
+      final places = await LocationService.instance.getCalmingLocations(position);
+      setState(() {
+        _places = places;
+        _loading = false;
+      });
+    } else {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   List<CalmingPlace> get _filteredPlaces {

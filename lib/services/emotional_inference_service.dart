@@ -6,6 +6,11 @@ enum EmotionalState { calm, restless, stressed, lowEnergy, neutral, distressed }
 class EmotionalInferenceService {
   static final EmotionalInferenceService instance = EmotionalInferenceService._init();
   EmotionalInferenceService._init();
+  
+  Future<void> initializeML() async {
+    // ML disabled due to TFLite compatibility issues
+    // Using rule-based system only
+  }
 
   Future<EmotionalState> inferEmotionalState() async {
     final patterns = await DatabaseService.instance.getRecentBehaviorPatterns(days: 3);

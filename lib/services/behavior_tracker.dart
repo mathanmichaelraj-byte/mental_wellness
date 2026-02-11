@@ -13,6 +13,7 @@ class BehaviorTracker {
   void startSession() {
     _sessionStart = DateTime.now();
     _appOpenCount++;
+    _savePattern(); // Save immediately on app open
   }
 
   void trackInteraction() {
@@ -22,28 +23,32 @@ class BehaviorTracker {
   void trackFeatureUsage(String feature) {
     _currentFeature = feature;
     trackInteraction();
+    _savePattern(); // Save when feature is used
   }
 
-  Future<void> endSession() async {
+  Future<void> _savePattern() async {
     if (_sessionStart == null) return;
 
     final now = DateTime.now();
     final sessionDuration = now.difference(_sessionStart!).inSeconds;
-    final interactionSpeed = sessionDuration > 0 ? _interactionCount ~/ (sessionDuration / 60) : 0;
+    final interactionSpeed = sessionDuration > 0 ? (_interactionCount / (sessionDuration / 60)).round() : 0;
 
     final pattern = BehaviorPattern(
       timestamp: now,
       appOpenCount: _appOpenCount,
       screenTimeSeconds: sessionDuration,
       timeOfDay: _getTimeOfDay(now),
-      interactionSpeed: interactionSpeed,
+      interactionSpeed: interactionSpeed.clamp(1, 10),
       dayOfWeek: _getDayOfWeek(now),
       sessionCount: 1,
       featureUsed: _currentFeature,
     );
 
     await DatabaseService.instance.insertBehaviorPattern(pattern);
+  }
 
+  Future<void> endSession() async {
+    await _savePattern();
     _sessionStart = null;
     _interactionCount = 0;
     _currentFeature = null;
@@ -51,15 +56,14 @@ class BehaviorTracker {
 
   String _getTimeOfDay(DateTime time) {
     final hour = time.hour;
-    if (hour >= 22 || hour < 6) return 'late_night';
-    if (hour >= 6 && hour < 9) return 'morning';
-    if (hour >= 12 && hour < 14) return 'midday';
-    if (hour >= 18 && hour < 22) return 'evening';
-    return 'daytime';
+    if (hour >= 22 || hour < 6) return 'lateNight';
+    if (hour >= 6 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'afternoon';
+    return 'evening';
   }
 
   String _getDayOfWeek(DateTime time) {
-    final days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     return days[time.weekday - 1];
   }
 

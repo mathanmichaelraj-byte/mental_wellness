@@ -1,4 +1,6 @@
 import 'package:geolocator/geolocator.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class CalmingPlace {
   final String name;
@@ -32,14 +34,91 @@ class LocationService {
     return Geolocator.distanceBetween(lat1, lon1, lat2, lon2) / 1000;
   }
 
-  List<CalmingPlace> getCalmingLocations() {
+  Future<List<CalmingPlace>> getCalmingLocations(Position? userPosition) async {
+    if (userPosition == null) return [];
+
+    final lat = userPosition.latitude;
+    final lng = userPosition.longitude;
+    
+    try {
+      // Query Overpass API for nearby places (5km radius)
+      final query = '''
+[out:json][timeout:25];
+(
+  node["amenity"="hospital"](around:5000,$lat,$lng);
+  node["amenity"="clinic"](around:5000,$lat,$lng);
+  node["healthcare"="psychotherapist"](around:5000,$lat,$lng);
+  node["leisure"="park"](around:5000,$lat,$lng);
+  node["leisure"="garden"](around:5000,$lat,$lng);
+  node["amenity"="meditation_centre"](around:5000,$lat,$lng);
+  node["amenity"="place_of_worship"](around:5000,$lat,$lng);
+  node["natural"="water"](around:5000,$lat,$lng);
+);
+out body;
+''';
+
+      final response = await http.post(
+        Uri.parse('https://overpass-api.de/api/interpreter'),
+        body: query,
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final elements = data['elements'] as List;
+        
+        final places = <CalmingPlace>[];
+        for (var element in elements) {
+          final tags = element['tags'] as Map<String, dynamic>?;
+          if (tags == null) continue;
+          
+          final name = tags['name'] ?? _getDefaultName(tags);
+          final type = _categorizePlace(tags);
+          
+          places.add(CalmingPlace(
+            name: name,
+            lat: element['lat'],
+            lng: element['lon'],
+            type: type,
+          ));
+          
+          if (places.length >= 20) break; // Limit to 20 places
+        }
+        
+        return places;
+      }
+    } catch (e) {
+      // Fallback to generated nearby places if API fails
+      print('Overpass API error: $e');
+    }
+    
+    // Fallback: Generate nearby places
     return [
-      CalmingPlace(name: 'City Park', lat: 28.6139, lng: 77.2090, type: 'Park'),
-      CalmingPlace(name: 'Meditation Center', lat: 28.6129, lng: 77.2295, type: 'Meditation'),
-      CalmingPlace(name: 'Community Hospital', lat: 28.6289, lng: 77.2065, type: 'Hospital'),
-      CalmingPlace(name: 'Mental Health Clinic', lat: 28.6189, lng: 77.2195, type: 'Therapist'),
-      CalmingPlace(name: 'Riverside Walk', lat: 28.6169, lng: 77.2150, type: 'Nature'),
-      CalmingPlace(name: 'Temple', lat: 28.6239, lng: 77.2100, type: 'Spiritual'),
+      CalmingPlace(name: 'City Park', lat: lat + 0.01, lng: lng + 0.01, type: 'Park'),
+      CalmingPlace(name: 'Meditation Center', lat: lat - 0.015, lng: lng + 0.02, type: 'Meditation'),
+      CalmingPlace(name: 'Community Hospital', lat: lat + 0.02, lng: lng - 0.01, type: 'Hospital'),
+      CalmingPlace(name: 'Mental Health Clinic', lat: lat - 0.01, lng: lng - 0.015, type: 'Therapist'),
+      CalmingPlace(name: 'Riverside Walk', lat: lat + 0.005, lng: lng + 0.015, type: 'Nature'),
+      CalmingPlace(name: 'Wellness Temple', lat: lat + 0.018, lng: lng - 0.005, type: 'Spiritual'),
     ];
+  }
+
+  String _getDefaultName(Map<String, dynamic> tags) {
+    if (tags.containsKey('amenity')) {
+      final amenity = tags['amenity'];
+      return amenity.toString().replaceAll('_', ' ').split(' ').map((w) => w[0].toUpperCase() + w.substring(1)).join(' ');
+    }
+    if (tags.containsKey('leisure')) return 'Park';
+    if (tags.containsKey('natural')) return 'Natural Area';
+    return 'Place';
+  }
+
+  String _categorizePlace(Map<String, dynamic> tags) {
+    if (tags['amenity'] == 'hospital' || tags['amenity'] == 'clinic') return 'Hospital';
+    if (tags['healthcare'] == 'psychotherapist') return 'Therapist';
+    if (tags['leisure'] == 'park' || tags['leisure'] == 'garden') return 'Park';
+    if (tags['amenity'] == 'meditation_centre') return 'Meditation';
+    if (tags['amenity'] == 'place_of_worship') return 'Spiritual';
+    if (tags['natural'] == 'water') return 'Nature';
+    return 'Park';
   }
 }

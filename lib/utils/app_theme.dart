@@ -1,149 +1,130 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Mental Wellness App Theme - "Serene Twilight"
-/// A therapeutically-informed color palette designed to promote calm,
-/// safety, and emotional well-being.
+/// Mental Wellness App Theme - Simplified 4-Color Palette
 class AppTheme {
   // ============================================================================
-  // PRIMARY COLOR PALETTE
+  // CORE COLOR PALETTE (4 Colors)
   // ============================================================================
   
-  /// Soft Lavender - Primary brand color
-  /// Psychology: Calming, peaceful, promotes mental clarity
-  static const primary = Color(0xFFA5B4FC);
+  /// Primary - Soft Indigo (Calm, Trust, Stability)
+  static const primary = Color(0xFF6366F1);
+  static const primaryLight = Color(0xFFA5B4FC);
+  static const primaryDark = Color(0xFF4F46E5);
   
-  /// Deeper Indigo - Accent for depth
-  static const primaryDark = Color(0xFF818CF8);
+  /// Secondary - Teal (Growth, Healing, Balance)
+  static const secondary = Color(0xFF14B8A6);
+  static const secondaryLight = Color(0xFF5EEAD4);
   
-  /// Gentle Teal - Success and growth indicators
-  /// Psychology: Healing, growth, stability
-  static const success = Color(0xFF5EEAD4);
+  /// Accent - Warm Amber (Attention, Care, Support)
+  static const accent = Color(0xFFF59E0B);
+  static const accentLight = Color(0xFFFBBF24);
   
-  /// Warm Peach - Gentle attention (replaces harsh orange)
-  /// Psychology: Comfort, care, supportive warmth
-  static const warning = Color(0xFFFED7AA);
+  /// Neutral - Slate (Text, Backgrounds)
+  static const neutral = Color(0xFF64748B);
+  static const neutralLight = Color(0xFFF1F5F9);
+  static const neutralDark = Color(0xFF1E293B);
   
-  /// Soft Coral - Error states with empathy
-  static const error = Color(0xFFFC8181);
+  // Semantic colors (derived from core palette)
+  static const success = secondary;
+  static const warning = accent;
+  static const error = Color(0xFFEF4444);
   
-  // ============================================================================
-  // BACKGROUND COLORS
-  // ============================================================================
+  // Background colors
+  static const background = Color(0xFFFAFAFA);
+  static const surface = Colors.white;
   
-  /// Cloud White - Main background
-  static const background = Color(0xFFF8FAFC);
-  
-  /// Soft Sage - Card and container backgrounds
-  /// Provides gentle separation without harsh contrast
-  static const surface = Color(0xFFECFDF5);
-  
-  /// Pure white for cards
-  static const surfaceWhite = Color(0xFFFFFFFF);
-  
-  // ============================================================================
-  // TEXT COLORS
-  // ============================================================================
-  
-  /// Slate - Primary text (WCAG AAA compliant)
-  static const textPrimary = Color(0xFF1E293B);
-  
-  /// Medium Slate - Secondary text
-  static const textSecondary = Color(0xFF64748B);
-  
-  /// Light Slate - Tertiary text and hints
+  // Text colors
+  static const textPrimary = neutralDark;
+  static const textSecondary = neutral;
   static const textTertiary = Color(0xFF94A3B8);
   
   // ============================================================================
-  // SEMANTIC COLORS
+  // GRADIENTS (Using Core Colors)
   // ============================================================================
   
-  /// Calm state color - gentle blue-green
-  static const stateCalm = Color(0xFF99F6E4);
-  
-  /// Restless state color - soft amber
-  static const stateRestless = Color(0xFFFDE68A);
-  
-  /// Stressed state color - warm peach (empathetic, not alarming)
-  static const stateStressed = Color(0xFFFED7AA);
-  
-  /// Low energy state color - gentle gray-blue
-  static const stateLowEnergy = Color(0xFFCBD5E1);
-  
-  // ============================================================================
-  // GRADIENTS
-  // ============================================================================
-  
-  /// Primary gradient - Lavender to soft purple
   static const primaryGradient = LinearGradient(
-    colors: [Color(0xFFA5B4FC), Color(0xFFC4B5FD)],
+    colors: [primary, primaryLight],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   
-  /// Success gradient - Teal to mint
   static const successGradient = LinearGradient(
-    colors: [Color(0xFF5EEAD4), Color(0xFF99F6E4)],
+    colors: [secondary, secondaryLight],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   
-  /// Warmth gradient - Peach to soft coral
-  static const warmthGradient = LinearGradient(
-    colors: [Color(0xFFFED7AA), Color(0xFFFCA5A5)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-  
-  /// Calm gradient - Soft blue to teal
-  static const calmGradient = LinearGradient(
-    colors: [Color(0xFFBFDBFE), Color(0xFF99F6E4)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-  
-  /// Breathing gradient - Gentle aqua to mint
   static const breathingGradient = LinearGradient(
-    colors: [Color(0xFF5EEAD4), Color(0xFF7DD3FC)],
+    colors: [secondaryLight, Color(0xFF7DD3FC)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   
-  /// Location gradient - Soft pink to coral
   static const locationGradient = LinearGradient(
-    colors: [Color(0xFFF9A8D4), Color(0xFFFCA5A5)],
+    colors: [Color(0xFFF472B6), Color(0xFFFCA5A5)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   
-  /// Audio gradient - Purple to lavender
   static const audioGradient = LinearGradient(
-    colors: [Color(0xFFC4B5FD), Color(0xFFDDD6FE)],
+    colors: [Color(0xFFC4B5FD), primaryLight],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+  
+  static const calmGradient = LinearGradient(
+    colors: [secondaryLight, Color(0xFF99F6E4)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  
+  static const warmthGradient = LinearGradient(
+    colors: [accentLight, Color(0xFFFCA5A5)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  
+  // ============================================================================
+  // SPACING (Consistent 8px grid)
+  // ============================================================================
+  
+  static const double space4 = 4.0;
+  static const double space8 = 8.0;
+  static const double space12 = 12.0;
+  static const double space16 = 16.0;
+  static const double space20 = 20.0;
+  static const double space24 = 24.0;
+  static const double space32 = 32.0;
+  static const double space48 = 48.0;
+  
+  // ============================================================================
+  // BORDER RADIUS (Consistent)
+  // ============================================================================
+  
+  static const double radiusSmall = 12.0;
+  static const double radiusMedium = 16.0;
+  static const double radiusLarge = 24.0;
+  static const double radiusXLarge = 28.0;
   
   // ============================================================================
   // SHADOWS
   // ============================================================================
   
-  /// Soft shadow for cards - subtle, layered effect
-  static BoxShadow get softShadow => BoxShadow(
-    color: Colors.black.withOpacity(0.04),
+  static BoxShadow get softShadow => const BoxShadow(
+    color: Color(0x0A000000),
     blurRadius: 20,
-    offset: const Offset(0, 4),
+    offset: Offset(0, 4),
   );
   
-  /// Medium shadow for elevated elements
-  static BoxShadow get mediumShadow => BoxShadow(
-    color: Colors.black.withOpacity(0.08),
+  static BoxShadow get mediumShadow => const BoxShadow(
+    color: Color(0x14000000),
     blurRadius: 30,
-    offset: const Offset(0, 8),
+    offset: Offset(0, 8),
   );
   
-  /// Glow effect for important elements
   static BoxShadow glowShadow(Color color) => BoxShadow(
-    color: color.withOpacity(0.3),
+    color: color.withValues(alpha: 0.3),
     blurRadius: 20,
     spreadRadius: -5,
   );
@@ -160,24 +141,18 @@ class AppTheme {
       colorScheme: ColorScheme.light(
         primary: primary,
         primaryContainer: Color(0xFFE0E7FF),
-        secondary: success,
+        secondary: secondary,
         secondaryContainer: Color(0xFFCCFBF1),
-        tertiary: warning,
+        tertiary: accent,
         tertiaryContainer: Color(0xFFFFEDD5),
         error: error,
-        errorContainer: Color(0xFFFEE2E2),
-        background: background,
-        surface: surfaceWhite,
-        surfaceVariant: surface,
+        surface: surface,
         onPrimary: Colors.white,
-        onSecondary: textPrimary,
-        onTertiary: textPrimary,
+        onSecondary: Colors.white,
+        onTertiary: neutralDark,
         onError: Colors.white,
-        onBackground: textPrimary,
         onSurface: textPrimary,
-        onSurfaceVariant: textSecondary,
         outline: Color(0xFFE2E8F0),
-        shadow: Colors.black.withOpacity(0.04),
       ),
       
       // Scaffold
@@ -203,40 +178,33 @@ class AppTheme {
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24), // Increased from 20
-          side: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+          borderRadius: BorderRadius.circular(radiusLarge),
+          side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
         ),
-        color: surfaceWhite,
-        margin: const EdgeInsets.symmetric(vertical: 8),
+        color: surface,
+        margin: const EdgeInsets.symmetric(vertical: space8),
       ),
       
       // Button themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: space32, vertical: space16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(radiusMedium),
           ),
           textStyle: const TextStyle(
-            fontFamily: 'Inter',
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
           ),
         ),
       ),
       
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: space24, vertical: space12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          textStyle: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+            borderRadius: BorderRadius.circular(radiusSmall),
           ),
         ),
       ),
@@ -259,156 +227,74 @@ class AppTheme {
       // Input decoration - gentle, accessible
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Color(0xFFF1F5F9),
-        contentPadding: const EdgeInsets.all(20), // Increased for better touch
+        fillColor: neutralLight,
+        contentPadding: const EdgeInsets.all(space20),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFFE2E8F0)),
+          borderRadius: BorderRadius.circular(radiusMedium),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFFE2E8F0)),
+          borderRadius: BorderRadius.circular(radiusMedium),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: error, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: error, width: 2),
-        ),
-        labelStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 15,
-          color: textSecondary,
-        ),
-        hintStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 15,
-          color: textTertiary,
+          borderRadius: BorderRadius.circular(radiusMedium),
+          borderSide: const BorderSide(color: primary, width: 2),
         ),
       ),
       
       // Dialog theme
       dialogTheme: DialogThemeData(
         elevation: 0,
-        backgroundColor: surfaceWhite,
+        backgroundColor: surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        titleTextStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-          color: textPrimary,
-        ),
-        contentTextStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 16,
-          height: 1.6,
-          color: textPrimary,
+          borderRadius: BorderRadius.circular(radiusXLarge),
         ),
       ),
       
       // Chip theme
       chipTheme: ChipThemeData(
-        backgroundColor: surface,
-        deleteIconColor: textSecondary,
-        labelStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 14,
-          color: textPrimary,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        backgroundColor: neutralLight,
+        padding: const EdgeInsets.symmetric(horizontal: space12, vertical: space8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(radiusSmall),
         ),
       ),
       
       // Divider theme
-      dividerTheme: DividerThemeData(
+      dividerTheme: const DividerThemeData(
         color: Color(0xFFE2E8F0),
         thickness: 1,
-        space: 24,
+        space: space24,
       ),
       
       // Icon theme
-      iconTheme: IconThemeData(
-        color: textSecondary,
+      iconTheme: const IconThemeData(
+        color: neutral,
         size: 24,
       ),
       
       // Typography
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         displayLarge: TextStyle(
-          fontFamily: 'Poppins',
           fontSize: 32,
-          fontWeight: FontWeight.w700,
-          color: textPrimary,
-          letterSpacing: -0.5,
-        ),
-        displayMedium: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 28,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-          letterSpacing: -0.3,
-        ),
-        headlineLarge: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 24,
           fontWeight: FontWeight.w700,
           color: textPrimary,
         ),
         headlineMedium: TextStyle(
-          fontFamily: 'Inter',
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: textPrimary,
         ),
-        titleLarge: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-        ),
-        titleMedium: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-        ),
         bodyLarge: TextStyle(
-          fontFamily: 'Inter',
           fontSize: 16,
-          fontWeight: FontWeight.w400,
           color: textPrimary,
           height: 1.6,
         ),
         bodyMedium: TextStyle(
-          fontFamily: 'Inter',
           fontSize: 14,
-          fontWeight: FontWeight.w400,
           color: textPrimary,
           height: 1.5,
-        ),
-        labelLarge: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-          letterSpacing: 0.3,
-        ),
-        labelMedium: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: textSecondary,
-          letterSpacing: 0.5,
         ),
       ),
     );
@@ -418,56 +304,19 @@ class AppTheme {
   // HELPER METHODS
   // ============================================================================
   
-  /// Get gradient for feature cards
-  static Gradient getFeatureGradient(String featureName) {
-    switch (featureName.toLowerCase()) {
-      case 'emotional_analysis':
-      case 'emotional analysis':
-        return primaryGradient;
-      case 'emotional_release':
-      case 'emotional release':
-        return successGradient;
-      case 'calm_audio':
-      case 'calm audio':
-        return audioGradient;
-      case 'location':
-      case 'find places':
-        return locationGradient;
-      case 'breathing':
-        return breathingGradient;
-      default:
-        return calmGradient;
-    }
-  }
-  
-  /// Get color for confidence level
   static Color getConfidenceColor(String level) {
     switch (level.toLowerCase()) {
-      case 'low':
-        return textSecondary;
-      case 'medium':
-        return success;
-      case 'high':
-        return warning;
-      default:
-        return textSecondary;
+      case 'high': return warning;
+      case 'medium': return success;
+      default: return neutral;
     }
   }
   
-  /// Get color for emotional state
   static Color getStateColor(String state) {
-    switch (state.toLowerCase()) {
-      case 'calm':
-        return stateCalm;
-      case 'restless':
-        return stateRestless;
-      case 'stressed':
-        return stateStressed;
-      case 'low_energy':
-      case 'low energy':
-        return stateLowEnergy;
-      default:
-        return primary;
-    }
+    if (state.contains('calm')) return secondaryLight;
+    if (state.contains('stressed')) return accentLight;
+    if (state.contains('restless')) return accentLight;
+    if (state.contains('low')) return neutral;
+    return primaryLight;
   }
 }

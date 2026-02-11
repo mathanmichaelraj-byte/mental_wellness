@@ -21,9 +21,20 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Increment version for migration
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Add sentiment column to existing table
+      await db.execute('ALTER TABLE emotional_notes ADD COLUMN sentiment TEXT');
+      await db.execute('ALTER TABLE behavior_patterns ADD COLUMN dayOfWeek TEXT DEFAULT "monday"');
+      await db.execute('ALTER TABLE behavior_patterns ADD COLUMN sessionCount INTEGER DEFAULT 1');
+      await db.execute('ALTER TABLE behavior_patterns ADD COLUMN featureUsed TEXT');
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -107,6 +118,25 @@ class DatabaseService {
       orderBy: 'timestamp DESC',
     );
     return result.map((map) => BehaviorPattern.fromMap(map)).toList();
+  }
+
+  Future<List<BehaviorPattern>> getBehaviorPatterns({int limit = 30}) async {
+    final db = await database;
+    final result = await db.query(
+      'behavior_patterns',
+      orderBy: 'timestamp DESC',
+      limit: limit,
+    );
+    return result.map((map) => BehaviorPattern.fromMap(map)).toList();
+  }
+
+  Future<List<EmotionalNote>> getEmotionalNotes() async {
+    final db = await database;
+    final result = await db.query(
+      'emotional_notes',
+      orderBy: 'createdAt DESC',
+    );
+    return result.map((map) => EmotionalNote.fromMap(map)).toList();
   }
 
   Future close() async {

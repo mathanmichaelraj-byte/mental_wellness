@@ -36,7 +36,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     await prefs.setBool('onboarding_complete', true);
     if (mounted) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => HomeScreen()),
       );
     }
   }
