@@ -40,6 +40,8 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
   Future<void> _initializeMap() async {
     final position = await LocationService.instance.getCurrentLocation();
     
+    if (!mounted) return;
+    
     setState(() {
       _currentPosition = position;
       _permissionDenied = position == null;
@@ -47,11 +49,13 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
     
     if (position != null) {
       final places = await LocationService.instance.getCalmingLocations(position);
+      if (!mounted) return;
       setState(() {
         _places = places;
         _loading = false;
       });
     } else {
+      if (!mounted) return;
       setState(() {
         _loading = false;
       });
@@ -383,8 +387,8 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
           options: MapOptions(
             initialCenter: _currentPosition != null
                 ? LatLng(_currentPosition!.latitude, _currentPosition!.longitude)
-                : LatLng(28.6139, 77.2090),
-            initialZoom: 13,
+                : const LatLng(28.6139, 77.2090),
+            initialZoom: 13.0,
           ),
           children: [
             TileLayer(
