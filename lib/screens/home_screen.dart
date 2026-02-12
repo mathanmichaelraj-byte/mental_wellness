@@ -23,13 +23,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      OptionalShareDialog.show(context, autoShow: true);
-      _loadEmotionalState();
-    });
-    
     _pulseController = AnimationController(duration: const Duration(seconds: 2), vsync: this)..repeat(reverse: true);
     _fadeController = AnimationController(duration: const Duration(milliseconds: 500), vsync: this)..forward();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadEmotionalState();
+      _showDialogIfNeeded();
+    });
+  }
+  
+  Future<void> _showDialogIfNeeded() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (mounted) {
+      await OptionalShareDialog.show(context, autoShow: true);
+    }
   }
 
   @override

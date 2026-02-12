@@ -12,24 +12,31 @@ class OptionalShareDialog {
       final today = DateTime.now().toIso8601String().split('T')[0];
       
       if (lastShown == today) return;
-      await prefs.setString('last_dialog_shown', today);
     }
     
     if (!context.mounted) return;
     
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 300));
     if (!context.mounted) return;
     
     await showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (context) => const _ShareDialog(),
+      builder: (context) => _ShareDialog(autoShow: autoShow),
     );
+    
+    if (autoShow) {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      await prefs.setString('last_dialog_shown', today);
+    }
   }
 }
 
 class _ShareDialog extends StatefulWidget {
-  const _ShareDialog();
+  final bool autoShow;
+  
+  const _ShareDialog({this.autoShow = false});
 
   @override
   State<_ShareDialog> createState() => _ShareDialogState();
