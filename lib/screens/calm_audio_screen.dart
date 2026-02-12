@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/audio_service.dart';
+import '../services/behavior_tracker.dart';
 import '../utils/app_theme.dart';
 
 class CalmAudioScreen extends StatefulWidget {
@@ -32,6 +33,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
   }
 
   Future<void> _playTrack(String track, Future<void> Function() playFunction) async {
+    BehaviorTracker.instance.trackInteraction();
     await AudioService.instance.stop();
     await playFunction();
     setState(() {

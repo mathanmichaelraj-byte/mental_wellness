@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/location_service.dart';
+import '../services/behavior_tracker.dart';
 import '../utils/app_theme.dart';
 
 class LocationFinderScreen extends StatefulWidget {
@@ -83,6 +84,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
   }
 
   void _showPlaceDetails(CalmingPlace place) {
+    BehaviorTracker.instance.trackInteraction();
     final distance = _currentPosition != null
         ? LocationService.instance.calculateDistance(
             _currentPosition!.latitude,

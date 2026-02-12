@@ -5,6 +5,7 @@ import '../utils/app_theme.dart';
 import '../utils/responsive.dart';
 import '../widgets/optional_share_dialog.dart';
 import '../widgets/ui_components.dart';
+import '../services/behavior_tracker.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _loadEmotionalState() async {
+    BehaviorTracker.instance.trackInteraction();
     final state = await EmotionalInferenceService.instance.inferEmotionalState();
     final confidence = await EmotionalInferenceService.instance.calculateConfidence();
     setState(() {

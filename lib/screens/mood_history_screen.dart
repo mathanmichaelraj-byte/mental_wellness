@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/emotional_inference_service.dart';
 import '../services/database_service.dart';
+import '../services/behavior_tracker.dart';
 import '../models/behavior_pattern.dart';
 import '../models/emotional_confidence.dart';
 import '../utils/app_theme.dart';
@@ -37,6 +38,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
   }
 
   Future<void> _loadData() async {
+    BehaviorTracker.instance.trackInteraction();
     setState(() => _loading = true);
     
     final state = await EmotionalInferenceService.instance.inferEmotionalState();
@@ -269,7 +271,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
                     ],
                   ),
                   child: Text(
-                    _confidence!.level.name.toUpperCase(),
+                    _confidence!.level.toString().split('.').last.toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,

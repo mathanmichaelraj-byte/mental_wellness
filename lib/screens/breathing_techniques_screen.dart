@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../services/behavior_tracker.dart';
 import '../utils/app_theme.dart';
 
 class BreathingTechnique {
@@ -215,6 +216,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
   }
 
   void _startExercise() {
+    BehaviorTracker.instance.trackInteraction();
     setState(() {
       _isRunning = true;
       _currentCycle = 1;

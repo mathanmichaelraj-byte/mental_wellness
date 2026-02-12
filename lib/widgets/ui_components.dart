@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
+import '../services/behavior_tracker.dart';
+import '../services/emotional_inference_service.dart';
+import '../models/emotional_confidence.dart';
 
 class IconContainer extends StatelessWidget {
   final IconData icon;
@@ -297,6 +300,9 @@ class EmotionalStateCard extends StatelessWidget {
   }
 
   String _getDescription() {
+    if (state is EmotionalState) {
+      return EmotionalInferenceService.instance.getStateDescription(state as EmotionalState);
+    }
     final stateStr = state.toString().split('.').last;
     switch (stateStr) {
       case 'calm': return 'You seem calm and balanced';
@@ -309,6 +315,12 @@ class EmotionalStateCard extends StatelessWidget {
   }
 
   List<String> _getSuggestions() {
+    if (state is EmotionalState && confidence is EmotionalConfidence) {
+      return EmotionalInferenceService.instance.getSuggestions(
+        state as EmotionalState,
+        (confidence as EmotionalConfidence).level,
+      );
+    }
     return ['Take a moment to breathe', 'Stay hydrated', 'Consider a short walk'];
   }
 }
@@ -321,11 +333,11 @@ class WellnessToolsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final features = [
-      {'title': 'Emotional Analysis', 'icon': Icons.insights, 'gradient': AppTheme.primaryGradient, 'route': '/mood'},
-      {'title': 'Emotional Release', 'icon': Icons.edit_note, 'gradient': AppTheme.successGradient, 'route': '/release'},
-      {'title': 'Calm Audio', 'icon': Icons.music_note, 'gradient': AppTheme.audioGradient, 'route': '/audio'},
-      {'title': 'Find Places', 'icon': Icons.location_on, 'gradient': AppTheme.locationGradient, 'route': '/location'},
-      {'title': 'Breathing', 'icon': Icons.air, 'gradient': AppTheme.breathingGradient, 'route': '/breathing'},
+      {'title': 'Emotional Analysis', 'icon': Icons.insights, 'gradient': AppTheme.primaryGradient, 'route': '/mood', 'feature': 'mood_analysis'},
+      {'title': 'Emotional Release', 'icon': Icons.edit_note, 'gradient': AppTheme.successGradient, 'route': '/release', 'feature': 'emotional_release'},
+      {'title': 'Calm Audio', 'icon': Icons.music_note, 'gradient': AppTheme.audioGradient, 'route': '/audio', 'feature': 'calm_audio'},
+      {'title': 'Find Places', 'icon': Icons.location_on, 'gradient': AppTheme.locationGradient, 'route': '/location', 'feature': 'location_finder'},
+      {'title': 'Breathing', 'icon': Icons.air, 'gradient': AppTheme.breathingGradient, 'route': '/breathing', 'feature': 'breathing_exercises'},
     ];
 
     return GridView.builder(
@@ -345,7 +357,10 @@ class WellnessToolsGrid extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => Navigator.pushNamed(context, f['route'] as String),
+              onTap: () {
+                BehaviorTracker.instance.trackFeatureUsage(f['feature'] as String);
+                Navigator.pushNamed(context, f['route'] as String);
+              },
               borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
               child: Container(
                 decoration: BoxDecoration(
