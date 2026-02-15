@@ -6,14 +6,12 @@ class BehaviorTracker {
   BehaviorTracker._init();
 
   DateTime? _sessionStart;
-  int _appOpenCount = 0;
   int _interactionCount = 0;
   String? _currentFeature;
 
   void startSession() {
     _sessionStart = DateTime.now();
-    _appOpenCount++;
-    _savePattern(); // Save immediately on app open
+    _interactionCount = 0;
   }
 
   void trackInteraction() {
@@ -23,28 +21,6 @@ class BehaviorTracker {
   void trackFeatureUsage(String feature) {
     _currentFeature = feature;
     trackInteraction();
-    _savePattern(); // Save when feature is used
-  }
-
-  Future<void> _savePattern() async {
-    if (_sessionStart == null) return;
-
-    final now = DateTime.now();
-    final sessionDuration = now.difference(_sessionStart!).inSeconds;
-    final interactionSpeed = sessionDuration > 0 ? (_interactionCount / (sessionDuration / 60)).round() : 0;
-
-    final pattern = BehaviorPattern(
-      timestamp: now,
-      appOpenCount: _appOpenCount,
-      screenTimeSeconds: sessionDuration,
-      timeOfDay: _getTimeOfDay(now),
-      interactionSpeed: interactionSpeed.clamp(1, 10),
-      dayOfWeek: _getDayOfWeek(now),
-      sessionCount: 1,
-      featureUsed: _currentFeature,
-    );
-
-    await DatabaseService.instance.insertBehaviorPattern(pattern);
   }
 
   Future<void> endSession() async {
@@ -52,6 +28,33 @@ class BehaviorTracker {
     _sessionStart = null;
     _interactionCount = 0;
     _currentFeature = null;
+  }
+
+  Future<void> _savePattern() async {
+    if (_sessionStart == null) return;
+
+    final now = DateTime.now();
+    final sessionDuration = now.difference(_sessionStart!).inSeconds;
+    
+    // Only save if session was at least 5 seconds
+    if (sessionDuration < 5) return;
+    
+    final interactionSpeed = sessionDuration > 0 
+        ? (_interactionCount / (sessionDuration / 60)).round().clamp(1, 10)
+        : 1;
+
+    final pattern = BehaviorPattern(
+      timestamp: now,
+      appOpenCount: 1, // Each session = 1 open
+      screenTimeSeconds: sessionDuration,
+      timeOfDay: _getTimeOfDay(now),
+      interactionSpeed: interactionSpeed,
+      dayOfWeek: _getDayOfWeek(now),
+      sessionCount: 1,
+      featureUsed: _currentFeature,
+    );
+
+    await DatabaseService.instance.insertBehaviorPattern(pattern);
   }
 
   String _getTimeOfDay(DateTime time) {

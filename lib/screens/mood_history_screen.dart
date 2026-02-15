@@ -416,19 +416,24 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
       );
     }
 
-    int totalOpens = 0;
-    int lateNightCount = 0;
+    // Aggregate by day
+    Map<String, List<BehaviorPattern>> dailyPatterns = {};
+    for (var pattern in _patterns) {
+      final day = pattern.timestamp.toIso8601String().split('T')[0];
+      dailyPatterns.putIfAbsent(day, () => []).add(pattern);
+    }
+
+    int lateNightSessions = 0;
     int totalScreenTime = 0;
 
     for (var pattern in _patterns) {
-      totalOpens += pattern.appOpenCount;
-      if (pattern.timeOfDay == 'late_night') lateNightCount++;
+      if (pattern.timeOfDay == 'lateNight') lateNightSessions++;
       totalScreenTime += pattern.screenTimeSeconds;
     }
 
-    double avgOpens = totalOpens / _patterns.length;
-    double lateNightPercent = (lateNightCount / _patterns.length) * 100;
-    int avgScreenTime = totalScreenTime ~/ _patterns.length;
+    double avgDailySessions = _patterns.length / dailyPatterns.length;
+    double lateNightPercent = (_patterns.isEmpty ? 0 : lateNightSessions / _patterns.length) * 100;
+    int avgScreenTime = _patterns.isEmpty ? 0 : totalScreenTime ~/ _patterns.length;
 
     return FadeTransition(
       opacity: _animationController,
@@ -452,8 +457,8 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
             const SizedBox(height: 20),
 
             _buildMetricRow(
-              'Daily App Opens',
-              avgOpens.toStringAsFixed(1),
+              'Daily Sessions',
+              avgDailySessions.toStringAsFixed(1),
               Icons.phone_android,
               AppTheme.primaryGradient,
             ),
@@ -470,7 +475,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
               AppTheme.breathingGradient,
             ),
             _buildMetricRow(
-              'Total Patterns',
+              'Total Sessions',
               _patterns.length.toString(),
               Icons.insights,
               AppTheme.successGradient,

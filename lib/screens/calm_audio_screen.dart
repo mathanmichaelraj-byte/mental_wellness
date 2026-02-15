@@ -106,11 +106,11 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
             ),
 
             _buildTrackCard(
-              'Rain Noise',
-              'Raining Sound for relaxation',
+              'Rain Noice',
+              'Gentle rain sounds for relaxation',
               Icons.air,
               AppTheme.breathingGradient,
-              () => _playTrack('Rain Noise', AudioService.instance.playBreathing),
+              () => _playTrack('Rain Sounds', AudioService.instance.playBreathing),
             ),
 
             _buildTrackCard(
