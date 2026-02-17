@@ -21,9 +21,19 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2, // Increment version for migration
+      version: 2,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
+      onOpen: (db) async {
+        // Verify tables exist, recreate if missing
+        final tables = await db.rawQuery(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='behavior_patterns'"
+        );
+        if (tables.isEmpty) {
+          await db.execute('''DROP TABLE IF EXISTS emotional_notes''');
+          await _createDB(db, 2);
+        }
+      },
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_screen.dart';
+import '../utils/app_theme.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -13,21 +14,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, String>> _pages = [
+  final List<Map<String, dynamic>> _pages = [
     {
       'title': 'Welcome to Mental Wellness',
       'description': 'Your personal companion for emotional well-being',
-      'icon': 'favorite'
+      'icon': Icons.favorite
     },
     {
       'title': 'Non-Intrusive Support',
       'description': 'We understand your emotions through gentle patterns, not questions',
-      'icon': 'psychology'
+      'icon': Icons.psychology
     },
     {
       'title': 'Calming Resources',
       'description': 'Access soothing audio and nearby calming locations',
-      'icon': 'spa'
+      'icon': Icons.spa
     },
   ];
 
@@ -59,32 +60,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        TweenAnimationBuilder(
-                          tween: Tween<double>(begin: 0, end: 1),
-                          duration: const Duration(milliseconds: 800),
-                          builder: (context, double value, child) {
-                            return Opacity(
-                              opacity: value,
-                              child: Transform.scale(
-                                scale: value,
-                                child: Container(
-                                  width: 120,
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [Colors.blue.shade300, Colors.purple.shade300],
-                                    ),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    _getIconData(page['icon']!),
-                                    size: 60,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.primaryGradient,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            page['icon'] as IconData,
+                            size: 60,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 40),
                         Text(
@@ -95,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         const SizedBox(height: 20),
                         Text(
                           page['description']!,
-                          style: const TextStyle(fontSize: 16, color: Colors.grey),
+                          style: TextStyle(fontSize: 16, color: AppTheme.textSecondary),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -113,7 +100,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   width: _currentPage == index ? 12 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: _currentPage == index ? Colors.blue : Colors.grey,
+                    color: _currentPage == index ? AppTheme.primary : AppTheme.textTertiary,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -131,6 +118,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: Colors.white,
                 ),
                 child: Text(_currentPage == _pages.length - 1 ? 'Get Started' : 'Next'),
               ),
@@ -140,18 +129,5 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
       ),
     );
-  }
-
-  IconData _getIconData(String iconName) {
-    switch (iconName) {
-      case 'favorite':
-        return Icons.favorite;
-      case 'psychology':
-        return Icons.psychology;
-      case 'spa':
-        return Icons.spa;
-      default:
-        return Icons.star;
-    }
   }
 }

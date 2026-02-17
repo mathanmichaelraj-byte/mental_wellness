@@ -1,6 +1,7 @@
 import '../models/emotional_confidence.dart';
 import '../models/behavior_pattern.dart';
 import 'database_service.dart';
+import '../utils/sentiment_analyzer.dart';
 
 enum EmotionalState { calm, restless, stressed, lowEnergy, neutral, distressed }
 
@@ -9,8 +10,7 @@ class EmotionalInferenceService {
   EmotionalInferenceService._init();
   
   Future<void> initializeML() async {
-    // ML disabled due to TFLite compatibility issues
-    // Using rule-based system only
+    // Rule-based system only, no ML initialization needed
   }
 
   Future<EmotionalState> inferEmotionalState() async {
@@ -31,11 +31,13 @@ class EmotionalInferenceService {
     int highSpeedSessions = 0;
     int shortSessions = 0;
     int negativeNoteCount = 0;
+    int positiveNoteCount = 0;
+    double totalSentimentScore = 0.0;
     List<int> sessionTimes = [];
 
     // Calculate daily metrics
     for (var dayPatterns in dailyPatterns.values) {
-      totalDailyOpens += dayPatterns.length; // Count sessions per day
+      totalDailyOpens += dayPatterns.length;
       for (var pattern in dayPatterns) {
         sessionTimes.add(pattern.screenTimeSeconds);
         if (pattern.timeOfDay == 'lateNight') lateNightSessions++;
@@ -44,8 +46,16 @@ class EmotionalInferenceService {
       }
     }
     
+    // Analyze emotional notes with NLP sentiment
     for (var note in emotionalNotes) {
-      if (note.sentiment == 'negative') negativeNoteCount++;
+      final sentiment = note.sentiment ?? SentimentAnalyzer.analyze(note.content);
+      if (sentiment == 'negative') {
+        negativeNoteCount++;
+        totalSentimentScore -= 1.0;
+      } else if (sentiment == 'positive') {
+        positiveNoteCount++;
+        totalSentimentScore += 1.0;
+      }
     }
 
     double avgDailyOpens = totalDailyOpens / dailyPatterns.length;
@@ -53,31 +63,36 @@ class EmotionalInferenceService {
     double lateNightRatio = patterns.isEmpty ? 0 : lateNightSessions / patterns.length;
     double highSpeedRatio = patterns.isEmpty ? 0 : highSpeedSessions / patterns.length;
     double shortSessionRatio = patterns.isEmpty ? 0 : shortSessions / patterns.length;
+    double avgSentiment = emotionalNotes.isEmpty ? 0 : totalSentimentScore / emotionalNotes.length;
 
-    // Distressed: High usage + late nights OR multiple negative notes
-    if ((avgDailyOpens > 10 && lateNightRatio > 0.5) || negativeNoteCount >= 3) {
+    // Distressed: Strong negative sentiment + behavioral distress signals
+    if ((negativeNoteCount >= 3 && avgSentiment < -0.6) || 
+        (avgDailyOpens > 10 && lateNightRatio > 0.5 && negativeNoteCount >= 2)) {
       return EmotionalState.distressed;
     }
     
-    // Restless: High speed interactions OR negative notes with erratic behavior
-    if ((avgDailyOpens > 7 && highSpeedRatio > 0.4) || 
-        (negativeNoteCount >= 2 && sessionVariance > 150)) {
+    // Restless: Negative sentiment with erratic behavior
+    if ((negativeNoteCount >= 2 && sessionVariance > 150) || 
+        (avgDailyOpens > 7 && highSpeedRatio > 0.4 && avgSentiment < -0.3)) {
       return EmotionalState.restless;
     }
     
-    // Stressed: Consistent late nights with moderate usage
-    if (lateNightRatio > 0.4 && avgDailyOpens > 5) {
+    // Stressed: Late nights + moderate negative sentiment
+    if ((lateNightRatio > 0.4 && avgDailyOpens > 5) || 
+        (negativeNoteCount >= 2 && lateNightRatio > 0.3)) {
       return EmotionalState.stressed;
     }
     
-    // Low Energy: Low usage with many short sessions
-    if (avgDailyOpens < 3 && shortSessionRatio > 0.5) {
+    // Low Energy: Low usage + negative or neutral sentiment
+    if ((avgDailyOpens < 3 && shortSessionRatio > 0.5) || 
+        (avgDailyOpens < 4 && negativeNoteCount >= 1 && positiveNoteCount == 0)) {
       return EmotionalState.lowEnergy;
     }
     
-    // Calm: Moderate usage, low speed, stable patterns
-    if (avgDailyOpens >= 3 && avgDailyOpens <= 6 && 
-        highSpeedRatio < 0.3 && sessionVariance < 150) {
+    // Calm: Positive sentiment + stable behavior
+    if ((positiveNoteCount >= 2 && avgSentiment > 0.5) || 
+        (avgDailyOpens >= 3 && avgDailyOpens <= 6 && highSpeedRatio < 0.3 && 
+         sessionVariance < 150 && negativeNoteCount == 0)) {
       return EmotionalState.calm;
     }
 
@@ -121,15 +136,40 @@ class EmotionalInferenceService {
       confidenceScore += 0.15;
     }
     
-    // Signal 2-3: Emotional expression
+    // Signal 2-4: NLP-enhanced emotional expression analysis
     if (emotionalNotes.length >= 2) {
       signals.add('frequent_emotional_expression');
-      confidenceScore += 0.2;
+      confidenceScore += 0.15;
       
-      final negativeCount = emotionalNotes.where((n) => n.sentiment == 'negative').length;
-      if (negativeCount >= 2) {
+      // Analyze sentiment with NLP
+      int negativeCount = 0;
+      int positiveCount = 0;
+      double totalSentiment = 0.0;
+      
+      for (var note in emotionalNotes) {
+        final sentiment = note.sentiment ?? SentimentAnalyzer.analyze(note.content);
+        if (sentiment == 'negative') {
+          negativeCount++;
+          totalSentiment -= 1.0;
+        } else if (sentiment == 'positive') {
+          positiveCount++;
+          totalSentiment += 1.0;
+        }
+      }
+      
+      // Strong negative sentiment pattern
+      if (negativeCount >= 3 || (negativeCount >= 2 && totalSentiment < -1.5)) {
+        signals.add('persistent_negative_sentiment');
+        confidenceScore += 0.3;
+      } else if (negativeCount >= 2) {
         signals.add('repeated_negative_sentiment');
-        confidenceScore += 0.25;
+        confidenceScore += 0.2;
+      }
+      
+      // Sentiment consistency (all same type)
+      if (emotionalNotes.length >= 3 && (negativeCount == emotionalNotes.length || positiveCount == emotionalNotes.length)) {
+        signals.add('consistent_emotional_pattern');
+        confidenceScore += 0.15;
       }
     }
     
