@@ -27,6 +27,8 @@ class MentalWellnessApp extends StatefulWidget {
 }
 
 class _MentalWellnessAppState extends State<MentalWellnessApp> with WidgetsBindingObserver {
+  ThemeMode _themeMode = ThemeMode.light;
+  
   @override
   void initState() {
     super.initState();
@@ -47,22 +49,55 @@ class _MentalWellnessAppState extends State<MentalWellnessApp> with WidgetsBindi
       BehaviorTracker.instance.startSession();
     }
   }
+  
+  void toggleTheme() {
+    setState(() {
+      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mental Wellness',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: SplashScreen(),
-      routes: {
-        '/home': (context) => HomeScreen(),
-        '/mood': (context) => MoodHistoryScreen(),
-        '/release': (context) => EmotionalReleaseScreen(),
-        '/audio': (context) => CalmAudioScreen(),
-        '/location': (context) => LocationFinderScreen(),
-        '/breathing': (context) => BreathingTechniquesScreen(),
-      },
+    return ThemeProvider(
+      toggleTheme: toggleTheme,
+      themeMode: _themeMode,
+      child: MaterialApp(
+        title: 'Mental Wellness',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: _themeMode,
+        home: SplashScreen(),
+        routes: {
+          '/home': (context) => HomeScreen(),
+          '/mood': (context) => MoodHistoryScreen(),
+          '/release': (context) => EmotionalReleaseScreen(),
+          '/audio': (context) => CalmAudioScreen(),
+          '/location': (context) => LocationFinderScreen(),
+          '/breathing': (context) => BreathingTechniquesScreen(),
+        },
+      ),
     );
+  }
+}
+
+class ThemeProvider extends InheritedWidget {
+  final Function() toggleTheme;
+  final ThemeMode themeMode;
+
+  const ThemeProvider({
+    super.key,
+    required this.toggleTheme,
+    required this.themeMode,
+    required super.child,
+  });
+
+  static ThemeProvider? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<ThemeProvider>();
+  }
+
+  @override
+  bool updateShouldNotify(ThemeProvider oldWidget) {
+    return themeMode != oldWidget.themeMode;
   }
 }

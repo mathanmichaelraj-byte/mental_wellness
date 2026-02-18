@@ -25,8 +25,8 @@ class IconContainer extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: useGradient ? LinearGradient(colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)]) : null,
         color: useGradient ? null : color,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        boxShadow: useGradient ? null : [AppTheme.glowShadow(color)],
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        boxShadow: useGradient ? null : [AppTheme.shadow],
       ),
       child: Icon(icon, color: useGradient ? color : Colors.white, size: size),
     );
@@ -63,8 +63,8 @@ class ActionButton extends StatelessWidget {
   ButtonStyle get _buttonStyle => ElevatedButton.styleFrom(
         backgroundColor: backgroundColor ?? AppTheme.primary,
         foregroundColor: foregroundColor ?? Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: AppTheme.space20, vertical: AppTheme.space16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: AppTheme.space16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
       );
 }
 
@@ -84,9 +84,9 @@ class SuggestionItem extends StatelessWidget {
             margin: const EdgeInsets.only(top: 3),
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              gradient: AppTheme.successGradient,
+              gradient: AppTheme.gradient,
               shape: BoxShape.circle,
-              boxShadow: [AppTheme.glowShadow(AppTheme.success)],
+              boxShadow: [AppTheme.shadow],
             ),
             child: const Icon(Icons.check, size: 14, color: Colors.white),
           ),
@@ -112,16 +112,16 @@ class BreathingStep extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(AppTheme.space12),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppTheme.success.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+              color: AppTheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radius),
             ),
-            child: Icon(icon, color: AppTheme.success, size: 20),
+            child: Icon(icon, color: AppTheme.primary, size: 20),
           ),
           const SizedBox(width: AppTheme.space16),
           Expanded(child: Text(action, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-          Text(duration, style: const TextStyle(fontSize: 14, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
+          Text(duration, style: TextStyle(fontSize: 14, color: AppTheme.textSecondary(context), fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -158,7 +158,7 @@ class HeaderSection extends StatelessWidget {
         Text('Mental Wellness', style: Theme.of(context).textTheme.displayLarge),
         const SizedBox(height: AppTheme.space8),
         Text('Your companion for emotional well-being',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary)),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary(context))),
       ],
     );
   }
@@ -175,19 +175,19 @@ class MedicalGuidanceCard extends StatelessWidget {
     return FadeTransition(
       opacity: fadeController,
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppTheme.space20),
+        margin: const EdgeInsets.only(bottom: 20),
         padding: const EdgeInsets.all(AppTheme.space24),
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [AppTheme.warning.withValues(alpha: 0.15), AppTheme.warning.withValues(alpha: 0.05)]),
-          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-          border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+          gradient: LinearGradient(colors: [AppTheme.primary.withValues(alpha: 0.15), AppTheme.primary.withValues(alpha: 0.05)]),
+          borderRadius: BorderRadius.circular(AppTheme.radius),
+          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                IconContainer(icon: Icons.favorite_outline, color: AppTheme.warning, size: 26),
+                IconContainer(icon: Icons.favorite_outline, color: AppTheme.primary, size: 26),
                 const SizedBox(width: AppTheme.space16),
                 const Expanded(child: Text('We\'re Here for You', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700))),
                 IconButton(icon: const Icon(Icons.close, size: 22), onPressed: onDismiss),
@@ -196,12 +196,12 @@ class MedicalGuidanceCard extends StatelessWidget {
             const SizedBox(height: AppTheme.space16),
             const Text('We\'ve noticed patterns that suggest you might benefit from additional support.',
                 style: TextStyle(fontSize: 15, height: 1.6)),
-            const SizedBox(height: AppTheme.space20),
+            const SizedBox(height: 20),
             ActionButton(
               label: 'Explore Support Options',
               icon: Icons.location_on,
-              backgroundColor: AppTheme.warning,
-              foregroundColor: AppTheme.textPrimary,
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.textPrimary(context),
               isFullWidth: true,
               onPressed: () => Navigator.pushNamed(context, '/location'),
             ),
@@ -233,12 +233,12 @@ class EmotionalStateCard extends StatelessWidget {
     return FadeTransition(
       opacity: fadeController,
       child: Container(
-        padding: const EdgeInsets.all(AppTheme.space32),
+        padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+          color: AppTheme.surface(context),
+          borderRadius: BorderRadius.circular(AppTheme.radius),
           border: Border.all(color: color.withValues(alpha: 0.2), width: 2),
-          boxShadow: [AppTheme.softShadow],
+          boxShadow: [AppTheme.shadow],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,7 +254,7 @@ class EmotionalStateCard extends StatelessWidget {
                       Text(_getDescription(), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 4),
                       Text('State: ${state.toString().split('.').last}',
-                          style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+                          style: TextStyle(fontSize: 12, color: AppTheme.textSecondary(context))),
                     ],
                   ),
                 ),
@@ -263,7 +263,7 @@ class EmotionalStateCard extends StatelessWidget {
             ),
             const SizedBox(height: AppTheme.space24),
             const Divider(height: 1),
-            const SizedBox(height: AppTheme.space20),
+            const SizedBox(height: 20),
             ..._getSuggestions().map((s) => SuggestionItem(text: s)),
           ],
         ),
@@ -279,7 +279,7 @@ class EmotionalStateCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16, vertical: AppTheme.space8),
         decoration: BoxDecoration(
           color: AppTheme.getConfidenceColor(levelName),
-          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+          borderRadius: BorderRadius.circular(AppTheme.radius),
         ),
         child: Text(levelName.toUpperCase(),
             style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
@@ -333,11 +333,11 @@ class WellnessToolsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final features = [
-      {'title': 'Emotional Analysis', 'icon': Icons.insights, 'gradient': AppTheme.primaryGradient, 'route': '/mood', 'feature': 'mood_analysis'},
-      {'title': 'Emotional Release', 'icon': Icons.edit_note, 'gradient': AppTheme.successGradient, 'route': '/release', 'feature': 'emotional_release'},
-      {'title': 'Calm Audio', 'icon': Icons.music_note, 'gradient': AppTheme.audioGradient, 'route': '/audio', 'feature': 'calm_audio'},
-      {'title': 'Find Places', 'icon': Icons.location_on, 'gradient': AppTheme.locationGradient, 'route': '/location', 'feature': 'location_finder'},
-      {'title': 'Breathing', 'icon': Icons.air, 'gradient': AppTheme.breathingGradient, 'route': '/breathing', 'feature': 'breathing_exercises'},
+      {'title': 'Emotional Analysis', 'icon': Icons.insights, 'gradient': AppTheme.gradient, 'route': '/mood', 'feature': 'mood_analysis'},
+      {'title': 'Emotional Release', 'icon': Icons.edit_note, 'gradient': AppTheme.gradient, 'route': '/release', 'feature': 'emotional_release'},
+      {'title': 'Calm Audio', 'icon': Icons.music_note, 'gradient': AppTheme.gradient, 'route': '/audio', 'feature': 'calm_audio'},
+      {'title': 'Find Places', 'icon': Icons.location_on, 'gradient': AppTheme.gradient, 'route': '/location', 'feature': 'location_finder'},
+      {'title': 'Breathing', 'icon': Icons.air, 'gradient': AppTheme.gradient, 'route': '/breathing', 'feature': 'breathing_exercises'},
     ];
 
     return GridView.builder(
@@ -361,12 +361,12 @@ class WellnessToolsGrid extends StatelessWidget {
                 BehaviorTracker.instance.trackFeatureUsage(f['feature'] as String);
                 Navigator.pushNamed(context, f['route'] as String);
               },
-              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+              borderRadius: BorderRadius.circular(AppTheme.radius),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: f['gradient'] as Gradient,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                  boxShadow: [AppTheme.softShadow],
+                  borderRadius: BorderRadius.circular(AppTheme.radius),
+                  boxShadow: [AppTheme.shadow],
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

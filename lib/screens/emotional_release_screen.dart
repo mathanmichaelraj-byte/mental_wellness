@@ -124,7 +124,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
         title: const Text('Emotional Release'),
         backgroundColor: Colors.transparent,
@@ -146,7 +146,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
             Text(
               'Write down your thoughts in a safe, temporary space',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondary(context),
               ),
             ),
             const SizedBox(height: 32),
@@ -198,7 +198,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
                           'Notes auto-delete after your chosen time',
                           style: TextStyle(
                             fontSize: 13,
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.textSecondary(context),
                             height: 1.4,
                           ),
                         ),
@@ -214,9 +214,9 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.surface(context),
                 borderRadius: BorderRadius.circular(24),
-                boxShadow: [AppTheme.softShadow],
+                boxShadow: [AppTheme.shadow],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,11 +238,11 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
                     decoration: InputDecoration(
                       hintText: 'Express what\'s on your mind...\n\nNo judgment, just release.',
                       hintStyle: TextStyle(
-                        color: AppTheme.textTertiary,
+                        color: AppTheme.textSecondary(context),
                         height: 1.6,
                       ),
                       filled: true,
-                      fillColor: AppTheme.background,
+                      fillColor: AppTheme.background(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -258,14 +258,14 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
                       Icon(
                         Icons.timer_outlined,
                         size: 20,
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondary(context),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         'Auto-delete after:',
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textSecondary(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -274,7 +274,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           decoration: BoxDecoration(
-                            color: AppTheme.background,
+                            color: AppTheme.background(context),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: DropdownButton<int>(
@@ -381,16 +381,16 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
         width: double.infinity,
         padding: const EdgeInsets.all(48),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface(context),
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [AppTheme.softShadow],
+          boxShadow: [AppTheme.shadow],
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
+                gradient: AppTheme.gradient,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -405,7 +405,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimary(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -414,7 +414,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondary(context),
                 height: 1.5,
               ),
             ),
@@ -439,13 +439,13 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface(context),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: _getSentimentColor(note.sentiment!).withOpacity(0.2),
           width: 2,
         ),
-        boxShadow: [AppTheme.softShadow],
+        boxShadow: [AppTheme.shadow],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,7 +509,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppTheme.background,
+              color: AppTheme.background(context),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -517,7 +517,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
                 Icon(
                   Icons.access_time,
                   size: 16,
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondary(context),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -528,7 +528,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
                         'Created ${DateFormat('MMM dd, hh:mm a').format(note.createdAt)}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textSecondary(context),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -536,7 +536,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
                         'Deletes in ${hoursRemaining}h ${minutesRemaining}m',
                         style: TextStyle(
                           fontSize: 11,
-                          color: AppTheme.textTertiary,
+                          color: AppTheme.textSecondary(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -558,7 +558,7 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
       case 'negative':
         return AppTheme.error;
       default:
-        return AppTheme.textSecondary;
+        return AppTheme.textSecondary(context);
     }
   }
 

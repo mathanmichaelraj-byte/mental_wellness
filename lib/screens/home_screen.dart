@@ -6,6 +6,7 @@ import '../utils/responsive.dart';
 import '../widgets/optional_share_dialog.dart';
 import '../widgets/ui_components.dart';
 import '../services/behavior_tracker.dart';
+import '../main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,8 +61,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final r = context.responsive;
+    final themeProvider = ThemeProvider.of(context);
     
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(themeProvider?.themeMode == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
+            onPressed: themeProvider?.toggleTheme,
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => OptionalShareDialog.show(context),
         backgroundColor: AppTheme.primary,
@@ -69,13 +79,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         label: const Text('Share Feelings'),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppTheme.background, Color(0xFFF5F5F5), AppTheme.neutralLight],
-          ),
-        ),
+        color: AppTheme.background(context),
         child: SafeArea(
           child: RefreshIndicator(
             onRefresh: _loadEmotionalState,

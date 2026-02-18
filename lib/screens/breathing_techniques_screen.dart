@@ -42,7 +42,7 @@ class BreathingTechniquesScreen extends StatelessWidget {
         exhale: 8,
         cycles: 4,
         icon: Icons.nightlight,
-        gradient: AppTheme.breathingGradient,
+        gradient: AppTheme.gradient,
       ),
       BreathingTechnique(
         name: 'Box Breathing',
@@ -53,7 +53,7 @@ class BreathingTechniquesScreen extends StatelessWidget {
         exhale: 4,
         cycles: 5,
         icon: Icons.crop_square,
-        gradient: AppTheme.primaryGradient,
+        gradient: AppTheme.gradient,
       ),
       BreathingTechnique(
         name: 'Anger Release',
@@ -64,7 +64,7 @@ class BreathingTechniquesScreen extends StatelessWidget {
         exhale: 6,
         cycles: 6,
         icon: Icons.whatshot,
-        gradient: AppTheme.warmthGradient,
+        gradient: AppTheme.gradient,
       ),
       BreathingTechnique(
         name: 'Grief Comfort',
@@ -75,7 +75,7 @@ class BreathingTechniquesScreen extends StatelessWidget {
         exhale: 7,
         cycles: 5,
         icon: Icons.favorite,
-        gradient: const LinearGradient(colors: [Color(0xFFF472B6), Color(0xFFFCA5A5)]),
+        gradient: AppTheme.gradient,
       ),
       BreathingTechnique(
         name: 'Energy Boost',
@@ -86,7 +86,7 @@ class BreathingTechniquesScreen extends StatelessWidget {
         exhale: 2,
         cycles: 10,
         icon: Icons.bolt,
-        gradient: AppTheme.successGradient,
+        gradient: AppTheme.gradient,
       ),
       BreathingTechnique(
         name: 'Sleep Preparation',
@@ -97,12 +97,12 @@ class BreathingTechniquesScreen extends StatelessWidget {
         exhale: 8,
         cycles: 6,
         icon: Icons.bedtime,
-        gradient: const LinearGradient(colors: [Color(0xFFC4B5FD), Color(0xFFDDD6FE)]),
+        gradient: AppTheme.gradient,
       ),
     ];
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
         title: const Text('Breathing Techniques'),
         backgroundColor: Colors.transparent,
@@ -138,19 +138,19 @@ class _TechniqueCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: AppTheme.space16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusLarge)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
         child: Padding(
-          padding: const EdgeInsets.all(AppTheme.space20),
+          padding: const EdgeInsets.all(AppTheme.space16),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(AppTheme.space16),
                 decoration: BoxDecoration(
                   gradient: technique.gradient,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  borderRadius: BorderRadius.circular(AppTheme.radius),
                 ),
                 child: Icon(technique.icon, color: Colors.white, size: 32),
               ),
@@ -166,17 +166,17 @@ class _TechniqueCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       technique.purpose,
-                      style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: 13, color: AppTheme.textSecondary(context), fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       technique.description,
-                      style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                      style: TextStyle(fontSize: 13, color: AppTheme.textSecondary(context)),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: AppTheme.textSecondary),
+              Icon(Icons.arrow_forward_ios, size: 16, color: AppTheme.textSecondary(context)),
             ],
           ),
         ),
@@ -272,7 +272,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusLarge)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
         title: const Text('Well Done!'),
         content: const Text('You completed the breathing exercise. How do you feel?'),
         actions: [
@@ -319,7 +319,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
         title: Text(widget.technique.name),
         backgroundColor: Colors.transparent,
@@ -364,7 +364,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
                         );
                       },
                     ),
-                    const SizedBox(height: AppTheme.space48),
+                    const SizedBox(height: 48),
                     Text(
                       _phase,
                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
@@ -373,7 +373,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
                     if (_isRunning)
                       Text(
                         'Cycle $_currentCycle of ${widget.technique.cycles}',
-                        style: const TextStyle(fontSize: 18, color: AppTheme.textSecondary),
+                        style: TextStyle(fontSize: 18, color: AppTheme.textSecondary(context)),
                       ),
                   ],
                 ),
@@ -388,7 +388,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
                         backgroundColor: AppTheme.error,
                         foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 56),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
                       ),
                       child: const Text('Stop', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                     )
@@ -398,7 +398,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
                         backgroundColor: AppTheme.primary,
                         foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 56),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
                       ),
                       child: const Text('Start Exercise', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                     ),

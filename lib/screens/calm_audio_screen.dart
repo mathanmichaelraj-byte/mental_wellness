@@ -58,7 +58,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
         title: const Text('Calm Audio'),
         backgroundColor: Colors.transparent,
@@ -80,7 +80,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
             Text(
               'Calming sounds to help you relax and center yourself',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondary(context),
               ),
             ),
             const SizedBox(height: 32),
@@ -101,7 +101,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
               'Calm Meditation',
               'Peaceful meditation sounds to quiet your mind',
               Icons.self_improvement,
-              AppTheme.primaryGradient,
+              AppTheme.gradient,
               () => _playTrack('Calm Meditation', AudioService.instance.playCalm),
             ),
 
@@ -109,7 +109,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
               'Rain Noice',
               'Gentle rain sounds for relaxation',
               Icons.air,
-              AppTheme.breathingGradient,
+              AppTheme.gradient,
               () => _playTrack('Rain Sounds', AudioService.instance.playBreathing),
             ),
 
@@ -117,7 +117,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
               'Nature Sounds',
               'Relaxing natural ambience from peaceful settings',
               Icons.nature,
-              AppTheme.successGradient,
+              AppTheme.gradient,
               () => _playTrack('Nature Sounds', AudioService.instance.playNature),
             ),
 
@@ -170,7 +170,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
                           'Use headphones for the best calming experience',
                           style: TextStyle(
                             fontSize: 13,
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.textSecondary(context),
                             height: 1.4,
                           ),
                         ),
@@ -191,16 +191,9 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
       margin: const EdgeInsets.only(bottom: 32),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: AppTheme.calmGradient,
+        gradient: AppTheme.gradient,
         borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          AppTheme.softShadow,
-          BoxShadow(
-            color: AppTheme.primary.withOpacity(0.2),
-            blurRadius: 30,
-            spreadRadius: -5,
-          ),
-        ],
+        boxShadow: [AppTheme.shadow],
       ),
       child: Column(
         children: [
@@ -328,7 +321,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
               spreadRadius: -5,
             )
           else
-            AppTheme.softShadow,
+            AppTheme.shadow,
         ],
       ),
       child: Material(
@@ -379,7 +372,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
                         description,
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textSecondary(context),
                           height: 1.4,
                         ),
                       ),
@@ -402,7 +395,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
                         : Icons.play_circle_outline,
                     color: isCurrentTrack 
                         ? AppTheme.primary 
-                        : AppTheme.textSecondary,
+                        : AppTheme.textSecondary(context),
                     size: 32,
                   ),
                 ),

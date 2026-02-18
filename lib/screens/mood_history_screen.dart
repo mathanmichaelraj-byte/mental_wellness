@@ -58,7 +58,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
         title: const Text('Emotional Analysis'),
         backgroundColor: Colors.transparent,
@@ -84,7 +84,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
                   Text(
                     'Analyzing your patterns...',
                     style: TextStyle(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondary(context),
                       fontSize: 14,
                     ),
                   ),
@@ -130,7 +130,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
         Text(
           'Understanding your emotional patterns over time',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppTheme.textSecondary,
+            color: AppTheme.textSecondary(context),
           ),
         ),
       ],
@@ -201,7 +201,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondary(context),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -233,7 +233,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [AppTheme.softShadow],
+          boxShadow: [AppTheme.shadow],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,7 +289,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
                 value: _confidence!.score,
-                backgroundColor: AppTheme.background,
+                backgroundColor: AppTheme.background(context),
                 color: _getConfidenceColor(_confidence!.level),
                 minHeight: 12,
               ),
@@ -303,7 +303,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
                 Text(
                   '${(_confidence!.score * 100).toStringAsFixed(0)}% confidence',
                   style: TextStyle(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondary(context),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -311,7 +311,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
                 Text(
                   '${_confidence!.signalCount} signals',
                   style: TextStyle(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondary(context),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -338,7 +338,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        gradient: AppTheme.successGradient,
+                        gradient: AppTheme.gradient,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -376,14 +376,14 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [AppTheme.softShadow],
+            boxShadow: [AppTheme.shadow],
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
+                  gradient: AppTheme.gradient,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -406,7 +406,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondary(context),
                   height: 1.5,
                 ),
               ),
@@ -442,7 +442,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [AppTheme.softShadow],
+          boxShadow: [AppTheme.shadow],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,25 +460,25 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
               'Daily Sessions',
               avgDailySessions.toStringAsFixed(1),
               Icons.phone_android,
-              AppTheme.primaryGradient,
+              AppTheme.gradient,
             ),
             _buildMetricRow(
               'Late Night Usage',
               '${lateNightPercent.toStringAsFixed(0)}%',
               Icons.nightlight_round,
-              AppTheme.warmthGradient,
+              AppTheme.gradient,
             ),
             _buildMetricRow(
               'Avg Session Time',
               '${avgScreenTime}s',
               Icons.timer,
-              AppTheme.breathingGradient,
+              AppTheme.gradient,
             ),
             _buildMetricRow(
               'Total Sessions',
               _patterns.length.toString(),
               Icons.insights,
-              AppTheme.successGradient,
+              AppTheme.gradient,
               isLast: true,
             ),
           ],
@@ -600,7 +600,7 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
                       'All analysis is done locally on your device. No data is sent anywhere.',
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimary(context),
                         height: 1.4,
                       ),
                     ),
@@ -665,11 +665,11 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
   Color _getConfidenceColor(ConfidenceLevel level) {
     switch (level) {
       case ConfidenceLevel.low:
-        return AppTheme.textSecondary;
+        return AppTheme.textSecondary(context);
       case ConfidenceLevel.medium:
         return AppTheme.success;
       case ConfidenceLevel.high:
-        return AppTheme.warning;
+        return AppTheme.primary;
     }
   }
 

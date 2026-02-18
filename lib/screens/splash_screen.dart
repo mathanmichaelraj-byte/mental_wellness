@@ -43,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
             colors: [
               AppTheme.primary.withOpacity(0.1),
               AppTheme.success.withOpacity(0.05),
-              AppTheme.background,
+              AppTheme.background(context),
             ],
           ),
         ),
@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
+                  gradient: AppTheme.gradient,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Text(
                 'Your companion for emotional well-being',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondary(context),
                 ),
               ),
             ],

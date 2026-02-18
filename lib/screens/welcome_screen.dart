@@ -64,7 +64,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            gradient: AppTheme.primaryGradient,
+                            gradient: AppTheme.gradient,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -82,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         const SizedBox(height: 20),
                         Text(
                           page['description']!,
-                          style: TextStyle(fontSize: 16, color: AppTheme.textSecondary),
+                          style: TextStyle(fontSize: 16, color: AppTheme.textSecondary(context)),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -100,7 +100,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   width: _currentPage == index ? 12 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: _currentPage == index ? AppTheme.primary : AppTheme.textTertiary,
+                    color: _currentPage == index ? AppTheme.primary : AppTheme.grey,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),

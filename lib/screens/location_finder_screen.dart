@@ -136,7 +136,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
                   decoration: BoxDecoration(
                     gradient: _getGradientForType(place.type),
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [AppTheme.softShadow],
+                    boxShadow: [AppTheme.shadow],
                   ),
                   child: Icon(
                     _getIconForType(place.type),
@@ -161,7 +161,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
                         place.type,
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textSecondary(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -177,7 +177,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.background,
+                  color: AppTheme.background(context),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -240,7 +240,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
         title: const Text('Find Support'),
         backgroundColor: Colors.transparent,
@@ -258,7 +258,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
                   Text(
                     'Loading nearby places...',
                     style: TextStyle(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondary(context),
                       fontSize: 14,
                     ),
                   ),
@@ -286,7 +286,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
+                gradient: AppTheme.gradient,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -309,7 +309,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
               'We need your location to show nearby places that can help. You can still browse the map, but your current location won\'t be shown.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondary(context),
                 fontSize: 15,
                 height: 1.5,
               ),
@@ -362,7 +362,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
               labelStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : AppTheme.textPrimary,
+                color: isSelected ? Colors.white : AppTheme.textPrimary(context),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               shape: RoundedRectangleBorder(
@@ -410,12 +410,12 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
-                        boxShadow: [AppTheme.mediumShadow],
+                        boxShadow: [AppTheme.shadow],
                       ),
                       padding: const EdgeInsets.all(4),
                       child: Container(
                         decoration: BoxDecoration(
-                          gradient: AppTheme.primaryGradient,
+                          gradient: AppTheme.gradient,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -439,7 +439,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
-                          boxShadow: [AppTheme.mediumShadow],
+                          boxShadow: [AppTheme.shadow],
                         ),
                         padding: const EdgeInsets.all(4),
                         child: Container(
@@ -471,7 +471,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [AppTheme.mediumShadow],
+              boxShadow: [AppTheme.shadow],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -493,7 +493,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
                         width: 8,
                         height: 8,
                         decoration: BoxDecoration(
-                          gradient: AppTheme.primaryGradient,
+                          gradient: AppTheme.gradient,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -502,7 +502,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
                         'You',
                         style: TextStyle(
                           fontSize: 11,
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textSecondary(context),
                         ),
                       ),
                     ],
@@ -536,25 +536,6 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
   }
 
   Gradient _getGradientForType(String type) {
-    switch (type) {
-      case 'Park':
-        return AppTheme.successGradient;
-      case 'Meditation':
-        return AppTheme.primaryGradient;
-      case 'Hospital':
-        return const LinearGradient(
-          colors: [Color(0xFFFC8181), Color(0xFFF56565)],
-        );
-      case 'Therapist':
-        return AppTheme.warmthGradient;
-      case 'Nature':
-        return AppTheme.breathingGradient;
-      case 'Spiritual':
-        return const LinearGradient(
-          colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
-        );
-      default:
-        return AppTheme.calmGradient;
-    }
+    return AppTheme.gradient;
   }
 }
