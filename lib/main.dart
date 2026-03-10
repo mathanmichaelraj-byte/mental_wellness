@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'services/database_service.dart';
 import 'services/notification_service.dart';
 import 'services/behavior_tracker.dart';
@@ -33,6 +34,15 @@ class _MentalWellnessAppState extends State<MentalWellnessApp> with WidgetsBindi
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _loadThemeMode();
+  }
+  
+  Future<void> _loadThemeMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isDark = prefs.getBool('isDarkMode') ?? false;
+    setState(() {
+      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    });
   }
 
   @override
@@ -50,9 +60,12 @@ class _MentalWellnessAppState extends State<MentalWellnessApp> with WidgetsBindi
     }
   }
   
-  void toggleTheme() {
+  Future<void> toggleTheme() async {
+    final newMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', newMode == ThemeMode.dark);
     setState(() {
-      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+      _themeMode = newMode;
     });
   }
 
