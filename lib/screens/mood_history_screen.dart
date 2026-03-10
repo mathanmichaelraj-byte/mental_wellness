@@ -231,9 +231,16 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
       child: Container(
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.primary.withOpacity(0.1),
+              AppTheme.success.withOpacity(0.05),
+            ],
+          ),
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [AppTheme.shadow],
+          border: Border.all(
+            color: AppTheme.primary.withOpacity(0.2),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -440,9 +447,16 @@ class _MoodHistoryScreenState extends State<MoodHistoryScreen>
       child: Container(
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.primary.withOpacity(0.1),
+              AppTheme.success.withOpacity(0.05),
+            ],
+          ),
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [AppTheme.shadow],
+          border: Border.all(
+            color: AppTheme.primary.withOpacity(0.2),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

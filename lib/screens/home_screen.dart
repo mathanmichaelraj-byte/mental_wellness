@@ -75,8 +75,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => OptionalShareDialog.show(context),
         backgroundColor: AppTheme.primary,
-        icon: const Icon(Icons.edit_note),
-        label: const Text('Share Feelings'),
+        icon: Icon(Icons.edit_note,color: AppTheme.iconPrimary(context),),
+        label: Text('Share Feelings',style: TextStyle(color: AppTheme.textPrimary(context)),),
       ),
       body: Container(
         color: AppTheme.background(context),

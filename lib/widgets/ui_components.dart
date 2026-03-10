@@ -258,7 +258,7 @@ class EmotionalStateCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (confidence != null) _buildBadge(),
+                if (confidence != null) _buildBadge(context),
               ],
             ),
             const SizedBox(height: AppTheme.space24),
@@ -271,7 +271,7 @@ class EmotionalStateCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBadge() {
+  Widget _buildBadge(BuildContext context) {
     final levelName = confidence.level.toString().split('.').last;
     return FadeTransition(
       opacity: Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: pulseController, curve: Curves.easeInOut)),
@@ -282,7 +282,7 @@ class EmotionalStateCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radius),
         ),
         child: Text(levelName.toUpperCase(),
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textPrimary(context))),
       ),
     );
   }
@@ -371,11 +371,11 @@ class WellnessToolsGrid extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(f['icon'] as IconData, size: 56, color: Colors.white),
+                    Icon(f['icon'] as IconData, size: 56, color: AppTheme.iconPrimary(context)),
                     const SizedBox(height: AppTheme.space16),
                     Text(f['title'] as String,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white, fontSize: 16)),
+                        style:TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textPrimary(context), fontSize: 16)),
                   ],
                 ),
               ),

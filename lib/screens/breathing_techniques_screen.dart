@@ -161,22 +161,22 @@ class _TechniqueCard extends StatelessWidget {
                   children: [
                     Text(
                       technique.name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,color: AppTheme.textPrimary(context)),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       technique.purpose,
-                      style: TextStyle(fontSize: 13, color: AppTheme.textSecondary(context), fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: 13, color: AppTheme.textPrimary(context), fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       technique.description,
-                      style: TextStyle(fontSize: 13, color: AppTheme.textSecondary(context)),
+                      style: TextStyle(fontSize: 13, color: AppTheme.textPrimary(context)),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: AppTheme.textSecondary(context)),
+              Icon(Icons.arrow_forward_ios, size: 16, color: AppTheme.textPrimary(context)),
             ],
           ),
         ),
@@ -373,7 +373,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
                     if (_isRunning)
                       Text(
                         'Cycle $_currentCycle of ${widget.technique.cycles}',
-                        style: TextStyle(fontSize: 18, color: AppTheme.textSecondary(context)),
+                        style: TextStyle(fontSize: 18, color: AppTheme.textPrimary(context)),
                       ),
                   ],
                 ),

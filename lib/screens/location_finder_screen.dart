@@ -356,7 +356,7 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
               onSelected: (selected) {
                 setState(() => _selectedCategory = category);
               },
-              backgroundColor: Colors.white,
+              backgroundColor: AppTheme.background(context),
               selectedColor: AppTheme.primary,
               checkmarkColor: Colors.white,
               labelStyle: TextStyle(

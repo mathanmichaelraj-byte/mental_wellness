@@ -18,6 +18,9 @@ class AppTheme {
   
   static Color textPrimary(BuildContext context) => 
     Theme.of(context).brightness == Brightness.light ? black : white;
+
+  static Color iconPrimary(BuildContext context) => 
+    Theme.of(context).brightness == Brightness.light ? black : white;
   
   static Color textSecondary(BuildContext context) => 
     Theme.of(context).brightness == Brightness.light ? grey : primaryLight;
