@@ -14,12 +14,15 @@ class LocationFinderScreen extends StatefulWidget {
   State<LocationFinderScreen> createState() => _LocationFinderScreenState();
 }
 
-class _LocationFinderScreenState extends State<LocationFinderScreen> {
+class _LocationFinderScreenState extends State<LocationFinderScreen>
+    with TickerProviderStateMixin {
   Position? _currentPosition;
   List<CalmingPlace> _places = [];
   bool _loading = true;
   bool _permissionDenied = false;
   String _selectedCategory = 'All';
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
 
   final List<String> _categories = [
     'All',
@@ -34,7 +37,16 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
   @override
   void initState() {
     super.initState();
+    _fadeController = AnimationController(duration: Duration(milliseconds: 600), vsync: this)..forward();
+    _slideController = AnimationController(duration: Duration(milliseconds: 800), vsync: this)..forward();
     _initializeMap();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeMap() async {
@@ -266,12 +278,22 @@ class _LocationFinderScreenState extends State<LocationFinderScreen> {
               ),
             )
           : _permissionDenied
-              ? _buildPermissionDeniedView()
-              : Column(
-                  children: [
-                    _buildCategoryFilter(),
-                    Expanded(child: _buildMap()),
-                  ],
+              ? FadeTransition(
+                  opacity: _fadeController,
+                  child: _buildPermissionDeniedView(),
+                )
+              : FadeTransition(
+                  opacity: _fadeController,
+                  child: SlideTransition(
+                    position: Tween<Offset>(begin: Offset(0, 0.2), end: Offset.zero)
+                        .animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut)),
+                    child: Column(
+                      children: [
+                        _buildCategoryFilter(),
+                        Expanded(child: _buildMap()),
+                      ],
+                    ),
+                  ),
                 ),
     );
   }

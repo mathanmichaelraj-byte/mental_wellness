@@ -68,10 +68,10 @@ class ActionButton extends StatelessWidget {
       );
 }
 
-class SuggestionItem extends StatelessWidget {
+class _SuggestionItem extends StatelessWidget {
   final String text;
 
-  const SuggestionItem({super.key, required this.text});
+  const _SuggestionItem({required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -98,68 +98,30 @@ class SuggestionItem extends StatelessWidget {
   }
 }
 
-class BreathingStep extends StatelessWidget {
-  final String action;
-  final String duration;
+class _IconContainer extends StatelessWidget {
   final IconData icon;
+  final Color color;
+  final double size;
+  final bool useGradient;
 
-  const BreathingStep({super.key, required this.action, required this.duration, required this.icon});
+  const _IconContainer({
+    required this.icon,
+    required this.color,
+    this.size = 28,
+    this.useGradient = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppTheme.space8),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radius),
-            ),
-            child: Icon(icon, color: AppTheme.primary, size: 20),
-          ),
-          const SizedBox(width: AppTheme.space16),
-          Expanded(child: Text(action, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-          Text(duration, style: TextStyle(fontSize: 14, color: AppTheme.textSecondary(context), fontWeight: FontWeight.w500)),
-        ],
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.space16),
+      decoration: BoxDecoration(
+        gradient: useGradient ? LinearGradient(colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)]) : null,
+        color: useGradient ? null : color,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        boxShadow: useGradient ? null : [AppTheme.shadow],
       ),
-    );
-  }
-}
-
-class FadeScaleTransition extends StatelessWidget {
-  final Widget child;
-  final int index;
-
-  const FadeScaleTransition({super.key, required this.child, this.index = 0});
-
-  @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 300 + (index * 100)),
-      curve: Curves.easeOut,
-      builder: (context, value, child) => Transform.scale(scale: 0.95 + (value * 0.05), child: Opacity(opacity: value, child: child)),
-      child: child,
-    );
-  }
-}
-
-// Home Screen Components
-class HeaderSection extends StatelessWidget {
-  const HeaderSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Mental Wellness', style: Theme.of(context).textTheme.displayLarge),
-        const SizedBox(height: AppTheme.space8),
-        Text('Your companion for emotional well-being',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary(context))),
-      ],
+      child: Icon(icon, color: useGradient ? color : Colors.white, size: size),
     );
   }
 }
@@ -187,7 +149,7 @@ class MedicalGuidanceCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                IconContainer(icon: Icons.favorite_outline, color: AppTheme.primary, size: 26),
+                _IconContainer(icon: Icons.favorite_outline, color: AppTheme.primary, size: 26),
                 const SizedBox(width: AppTheme.space16),
                 const Expanded(child: Text('We\'re Here for You', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700))),
                 IconButton(icon: const Icon(Icons.close, size: 22), onPressed: onDismiss),
@@ -197,13 +159,19 @@ class MedicalGuidanceCard extends StatelessWidget {
             const Text('We\'ve noticed patterns that suggest you might benefit from additional support.',
                 style: TextStyle(fontSize: 15, height: 1.6)),
             const SizedBox(height: 20),
-            ActionButton(
-              label: 'Explore Support Options',
-              icon: Icons.location_on,
-              backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.textPrimary(context),
-              isFullWidth: true,
-              onPressed: () => Navigator.pushNamed(context, '/location'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, '/location'),
+                icon: const Icon(Icons.location_on),
+                label: const Text('Explore Support Options'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: AppTheme.space16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
+                ),
+              ),
             ),
           ],
         ),
@@ -245,7 +213,7 @@ class EmotionalStateCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                IconContainer(icon: _getIcon(), color: color, useGradient: true),
+                _IconContainer(icon: Icons.self_improvement, color: color, useGradient: true),
                 const SizedBox(width: AppTheme.space16),
                 Expanded(
                   child: Column(
@@ -264,7 +232,7 @@ class EmotionalStateCard extends StatelessWidget {
             const SizedBox(height: AppTheme.space24),
             const Divider(height: 1),
             const SizedBox(height: 20),
-            ..._getSuggestions().map((s) => SuggestionItem(text: s)),
+            ..._getSuggestions().map((s) => _SuggestionItem(text: s)),
           ],
         ),
       ),
@@ -285,18 +253,6 @@ class EmotionalStateCard extends StatelessWidget {
             style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textPrimary(context))),
       ),
     );
-  }
-
-  IconData _getIcon() {
-    final stateStr = state.toString().split('.').last;
-    switch (stateStr) {
-      case 'calm': return Icons.self_improvement;
-      case 'restless': return Icons.trending_up;
-      case 'stressed': return Icons.warning_amber_rounded;
-      case 'lowEnergy': return Icons.battery_2_bar;
-      case 'distressed': return Icons.emergency;
-      default: return Icons.sentiment_neutral;
-    }
   }
 
   String _getDescription() {
@@ -322,6 +278,24 @@ class EmotionalStateCard extends StatelessWidget {
       );
     }
     return ['Take a moment to breathe', 'Stay hydrated', 'Consider a short walk'];
+  }
+}
+
+class FadeScaleTransition extends StatelessWidget {
+  final Widget child;
+  final int index;
+
+  const FadeScaleTransition({super.key, required this.child, this.index = 0});
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 300 + (index * 100)),
+      curve: Curves.easeOut,
+      builder: (context, value, child) => Transform.scale(scale: 0.95 + (value * 0.05), child: Opacity(opacity: value, child: child)),
+      child: child,
+    );
   }
 }
 

@@ -27,8 +27,30 @@ class BreathingTechnique {
   });
 }
 
-class BreathingTechniquesScreen extends StatelessWidget {
+class BreathingTechniquesScreen extends StatefulWidget {
   const BreathingTechniquesScreen({super.key});
+
+  @override
+  State<BreathingTechniquesScreen> createState() => _BreathingTechniquesScreenState();
+}
+
+class _BreathingTechniquesScreenState extends State<BreathingTechniquesScreen> with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(duration: Duration(milliseconds: 600), vsync: this)..forward();
+    _slideController = AnimationController(duration: Duration(milliseconds: 800), vsync: this)..forward();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,21 +130,41 @@ class BreathingTechniquesScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(AppTheme.space16),
-        itemCount: techniques.length,
-        itemBuilder: (context, index) {
-          final technique = techniques[index];
-          return _TechniqueCard(
-            technique: technique,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => BreathingExerciseScreen(technique: technique),
-              ),
-            ),
-          );
-        },
+      body: FadeTransition(
+        opacity: _fadeController,
+        child: SlideTransition(
+          position: Tween<Offset>(begin: Offset(0, 0.2), end: Offset.zero)
+              .animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut)),
+          child: ListView.builder(
+            padding: const EdgeInsets.all(AppTheme.space16),
+            itemCount: techniques.length,
+            itemBuilder: (context, index) {
+              final technique = techniques[index];
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: Duration(milliseconds: 300 + (index * 100)),
+                curve: Curves.easeOut,
+                builder: (context, value, child) {
+                  return Transform.translate(
+                    offset: Offset(0, 20 * (1 - value)),
+                    child: Opacity(
+                      opacity: value,
+                      child: _TechniqueCard(
+                        technique: technique,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BreathingExerciseScreen(technique: technique),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -337,27 +379,32 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
                       animation: _animController,
                       builder: (context, child) {
                         final size = 150 + (_animController.value * 100);
-                        return Container(
-                          width: size,
-                          height: size,
-                          decoration: BoxDecoration(
-                            gradient: widget.technique.gradient,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: widget.technique.gradient.colors.first.withValues(alpha: 0.4 * _animController.value),
-                                blurRadius: 40 + (_animController.value * 20),
-                                spreadRadius: 5 + (_animController.value * 10),
-                              ),
-                            ],
+                        return ScaleTransition(
+                          scale: Tween<double>(begin: 0.8, end: 1.2).animate(
+                            CurvedAnimation(parent: _animController, curve: Curves.easeInOut),
                           ),
-                          child: Center(
-                            child: Text(
-                              _countdown > 0 ? '$_countdown' : '',
-                              style: const TextStyle(
-                                fontSize: 64,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                          child: Container(
+                            width: size,
+                            height: size,
+                            decoration: BoxDecoration(
+                              gradient: widget.technique.gradient,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: widget.technique.gradient.colors.first.withValues(alpha: 0.4 * _animController.value),
+                                  blurRadius: 40 + (_animController.value * 20),
+                                  spreadRadius: 5 + (_animController.value * 10),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                _countdown > 0 ? '$_countdown' : '',
+                                style: const TextStyle(
+                                  fontSize: 64,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -381,27 +428,32 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> with 
             ),
             Padding(
               padding: const EdgeInsets.all(AppTheme.space24),
-              child: _isRunning
-                  ? ElevatedButton(
-                      onPressed: _stopExercise,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.error,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 56),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+                  CurvedAnimation(parent: _animController, curve: Curves.easeOut),
+                ),
+                child: _isRunning
+                    ? ElevatedButton(
+                        onPressed: _stopExercise,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.error,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 56),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
+                        ),
+                        child: const Text('Stop', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                      )
+                    : ElevatedButton(
+                        onPressed: _startExercise,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primary,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 56),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
+                        ),
+                        child: const Text('Start Exercise', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                       ),
-                      child: const Text('Stop', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                    )
-                  : ElevatedButton(
-                      onPressed: _startExercise,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 56),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
-                      ),
-                      child: const Text('Start Exercise', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                    ),
+              ),
             ),
           ],
         ),

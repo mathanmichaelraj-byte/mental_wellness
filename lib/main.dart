@@ -16,6 +16,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseService.instance.database;
   await NotificationService.instance.initialize();
+  await NotificationService.instance.scheduleDailyReminder();
   BehaviorTracker.instance.startSession();
   runApp(const MentalWellnessApp());
 }

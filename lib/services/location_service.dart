@@ -41,7 +41,6 @@ class LocationService {
     final lng = userPosition.longitude;
     
     try {
-      // Query Overpass API for nearby places (5km radius)
       final query = '''
 [out:json][timeout:25];
 (

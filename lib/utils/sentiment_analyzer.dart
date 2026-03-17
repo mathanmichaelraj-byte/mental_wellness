@@ -6,6 +6,8 @@ class SentimentAnalyzer {
     'stressed': 2.0, 'worried': 2.0, 'scared': 2.0, 'angry': 2.0, 'frustrated': 2.0,
     'sad': 1.5, 'lonely': 1.5, 'tired': 1.5, 'exhausted': 1.5, 'hurt': 1.5,
     'bad': 1.0, 'upset': 1.0, 'down': 1.0, 'unhappy': 1.0, 'difficult': 1.0,
+    'fucked': 3.0, 'screwed': 2.5, 'messed up': 2.0, 'destroyed': 3.0,
+    'cooked': 2.0, 'broken': 2.5, 'ruined': 3.0, 'sucked': 2.0, 'horrible': 3.0,
   };
 
   static const Map<String, double> _positiveWords = {
@@ -85,9 +87,9 @@ class SentimentAnalyzer {
     double confidence = (score.abs() / (wordCount > 0 ? wordCount : 1)).clamp(0.0, 1.0);
     
     String sentiment;
-    if (score <= -2.0) {
+    if (score < 0) {
       sentiment = 'negative';
-    } else if (score >= 2.0) {
+    } else if (score > 2.0) {
       sentiment = 'positive';
     } else {
       sentiment = 'neutral';

@@ -14,11 +14,12 @@ class EmotionalReleaseScreen extends StatefulWidget {
 }
 
 class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen> 
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
   List<EmotionalNote> _notes = [];
   int _expiryHours = 24;
   late AnimationController _fadeController;
+  late AnimationController _slideController;
 
   @override
   void initState() {
@@ -28,12 +29,17 @@ class _EmotionalReleaseScreenState extends State<EmotionalReleaseScreen>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     )..forward();
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    )..forward();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     _fadeController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
