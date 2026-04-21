@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_constants.dart';
 import '../services/audio_service.dart';
 import '../services/behavior_tracker.dart';
 import '../utils/app_theme.dart';
@@ -22,15 +23,15 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
   void initState() {
     super.initState();
     _pulseController = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: Duration(milliseconds: AppConstants.pulseAnimationMs),
       vsync: this,
     )..repeat(reverse: true);
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: Duration(milliseconds: AppConstants.fadeAnimationMs),
       vsync: this,
     )..forward();
     _slideController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: Duration(milliseconds: AppConstants.slideAnimationMs),
       vsync: this,
     )..forward();
   }
@@ -311,7 +312,7 @@ class _CalmAudioScreenState extends State<CalmAudioScreen>
 
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 300 + (index * 100)),
+      duration: Duration(milliseconds: 300 + (index * AppConstants.staggerDelayMs)),
       curve: Curves.easeOut,
       builder: (context, value, child) {
         return Transform.translate(

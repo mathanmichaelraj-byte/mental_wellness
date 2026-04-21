@@ -24,6 +24,12 @@ class AppTheme {
   
   static Color textSecondary(BuildContext context) => 
     Theme.of(context).brightness == Brightness.light ? grey : primaryLight;
+
+  static const gradientDeep = LinearGradient(
+    colors: [Color(0xFF0A7A6E), primary, primaryLight],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
   
   // Semantic (reuse core colors)
   static const success = primary;

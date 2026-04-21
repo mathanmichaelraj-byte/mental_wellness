@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_constants.dart';
 import '../utils/app_theme.dart';
 import '../services/behavior_tracker.dart';
 import '../services/emotional_inference_service.dart';
@@ -162,7 +163,7 @@ class MedicalGuidanceCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(context, '/location'),
+                onPressed: () => Navigator.pushNamed(context, AppConstants.locationRoute),
                 icon: const Icon(Icons.location_on),
                 label: const Text('Explore Support Options'),
                 style: ElevatedButton.styleFrom(
@@ -307,11 +308,12 @@ class WellnessToolsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final features = [
-      {'title': 'Emotional Analysis', 'icon': Icons.insights, 'gradient': AppTheme.gradient, 'route': '/mood', 'feature': 'mood_analysis'},
-      {'title': 'Emotional Release', 'icon': Icons.edit_note, 'gradient': AppTheme.gradient, 'route': '/release', 'feature': 'emotional_release'},
-      {'title': 'Calm Audio', 'icon': Icons.music_note, 'gradient': AppTheme.gradient, 'route': '/audio', 'feature': 'calm_audio'},
-      {'title': 'Find Places', 'icon': Icons.location_on, 'gradient': AppTheme.gradient, 'route': '/location', 'feature': 'location_finder'},
-      {'title': 'Breathing', 'icon': Icons.air, 'gradient': AppTheme.gradient, 'route': '/breathing', 'feature': 'breathing_exercises'},
+      {'title': 'Emotional Analysis', 'icon': Icons.insights, 'gradient': AppTheme.gradient, 'route': AppConstants.moodRoute, 'feature': AppConstants.moodAnalysisFeature},
+      {'title': 'Emotional Release', 'icon': Icons.edit_note, 'gradient': AppTheme.gradient, 'route': AppConstants.releaseRoute, 'feature': AppConstants.emotionalReleaseFeature},
+      {'title': 'Calm Audio', 'icon': Icons.music_note, 'gradient': AppTheme.gradient, 'route': AppConstants.audioRoute, 'feature': AppConstants.calmAudioFeature},
+      {'title': 'Find Places', 'icon': Icons.location_on, 'gradient': AppTheme.gradient, 'route': AppConstants.locationRoute, 'feature': AppConstants.locationFinderFeature},
+      {'title': 'Breathing', 'icon': Icons.air, 'gradient': AppTheme.gradient, 'route': AppConstants.breathingRoute, 'feature': AppConstants.breathingExercisesFeature},
+      {'title': 'Gratitude Journal', 'icon': Icons.favorite, 'gradient': AppTheme.gradient, 'route': AppConstants.gratitudeRoute, 'feature': AppConstants.gratitudeJournalFeature},
     ];
 
     return GridView.builder(

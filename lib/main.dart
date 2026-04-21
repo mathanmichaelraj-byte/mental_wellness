@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'core/constants/app_constants.dart';
 import 'services/database_service.dart';
 import 'services/notification_service.dart';
+import 'services/affirmation_service.dart';
 import 'services/behavior_tracker.dart';
-import 'screens/splash_screen.dart';
+import 'screens/auth_wrapper.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/settings_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/mood_history_screen.dart';
 import 'screens/emotional_release_screen.dart';
 import 'screens/calm_audio_screen.dart';
 import 'screens/location_finder_screen.dart';
 import 'screens/breathing_techniques_screen.dart';
+import 'screens/gratitude_screen.dart';
 import 'utils/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await DatabaseService.instance.database;
   await NotificationService.instance.initialize();
-  await NotificationService.instance.scheduleDailyReminder();
+  await AffirmationService.instance.initialize();
+  
   BehaviorTracker.instance.startSession();
   runApp(const MentalWellnessApp());
 }
@@ -76,19 +89,23 @@ class _MentalWellnessAppState extends State<MentalWellnessApp> with WidgetsBindi
       toggleTheme: toggleTheme,
       themeMode: _themeMode,
       child: MaterialApp(
-        title: 'Mental Wellness',
+        title: AppConstants.appName,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: _themeMode,
-        home: SplashScreen(),
+        home: AuthWrapper(),
         routes: {
-          '/home': (context) => HomeScreen(),
-          '/mood': (context) => MoodHistoryScreen(),
-          '/release': (context) => EmotionalReleaseScreen(),
-          '/audio': (context) => CalmAudioScreen(),
-          '/location': (context) => LocationFinderScreen(),
-          '/breathing': (context) => BreathingTechniquesScreen(),
+          AppConstants.loginRoute: (context) => LoginScreen(),
+          AppConstants.signupRoute: (context) => SignUpScreen(),
+          AppConstants.settingsRoute: (context) => SettingsScreen(),
+          AppConstants.homeRoute: (context) => HomeScreen(),
+          AppConstants.moodRoute: (context) => MoodHistoryScreen(),
+          AppConstants.releaseRoute: (context) => EmotionalReleaseScreen(),
+          AppConstants.audioRoute: (context) => CalmAudioScreen(),
+          AppConstants.locationRoute: (context) => LocationFinderScreen(),
+          AppConstants.breathingRoute: (context) => BreathingTechniquesScreen(),
+          AppConstants.gratitudeRoute: (context) => GratitudeScreen(),
         },
       ),
     );

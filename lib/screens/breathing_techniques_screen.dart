@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../core/constants/app_constants.dart';
 import '../services/behavior_tracker.dart';
 import '../utils/app_theme.dart';
 
@@ -41,8 +42,14 @@ class _BreathingTechniquesScreenState extends State<BreathingTechniquesScreen> w
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(duration: Duration(milliseconds: 600), vsync: this)..forward();
-    _slideController = AnimationController(duration: Duration(milliseconds: 800), vsync: this)..forward();
+    _fadeController = AnimationController(
+      duration: Duration(milliseconds: AppConstants.fadeAnimationMs),
+      vsync: this,
+    )..forward();
+    _slideController = AnimationController(
+      duration: Duration(milliseconds: AppConstants.slideAnimationMs),
+      vsync: this,
+    )..forward();
   }
 
   @override
@@ -142,7 +149,7 @@ class _BreathingTechniquesScreenState extends State<BreathingTechniquesScreen> w
               final technique = techniques[index];
               return TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0.0, end: 1.0),
-                duration: Duration(milliseconds: 300 + (index * 100)),
+                duration: Duration(milliseconds: 300 + (index * AppConstants.staggerDelayMs)),
                 curve: Curves.easeOut,
                 builder: (context, value, child) {
                   return Transform.translate(

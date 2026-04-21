@@ -1,4 +1,5 @@
 import 'database_service.dart';
+import '../core/constants/app_constants.dart';
 import '../models/behavior_pattern.dart';
 
 class BehaviorTracker {
@@ -36,16 +37,15 @@ class BehaviorTracker {
     final now = DateTime.now();
     final sessionDuration = now.difference(_sessionStart!).inSeconds;
     
-    // Only save if session was at least 5 seconds
-    if (sessionDuration < 5) return;
+    if (sessionDuration < AppConstants.minSessionSeconds) return;
     
     final interactionSpeed = sessionDuration > 0 
-        ? (_interactionCount / (sessionDuration / 60)).round().clamp(1, 10)
+        ? (_interactionCount / (sessionDuration / 60)).round().clamp(1, AppConstants.maxInteractionSpeed)
         : 1;
 
     final pattern = BehaviorPattern(
       timestamp: now,
-      appOpenCount: 1, // Each session = 1 open
+      appOpenCount: 1,
       screenTimeSeconds: sessionDuration,
       timeOfDay: _getTimeOfDay(now),
       interactionSpeed: interactionSpeed,

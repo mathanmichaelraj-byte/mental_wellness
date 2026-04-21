@@ -2,6 +2,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/emotional_note.dart';
 import '../models/behavior_pattern.dart';
+import '../models/gratitude_entry.dart';
+import '../core/constants/app_constants.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
@@ -21,17 +23,16 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: AppConstants.dbVersion,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
-        // Verify tables exist, recreate if missing
         final tables = await db.rawQuery(
           "SELECT name FROM sqlite_master WHERE type='table' AND name='behavior_patterns'"
         );
         if (tables.isEmpty) {
           await db.execute('''DROP TABLE IF EXISTS emotional_notes''');
-          await _createDB(db, 2);
+          await _createDB(db, AppConstants.dbVersion);
         }
       },
     );
@@ -39,11 +40,20 @@ class DatabaseService {
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Add sentiment column to existing table
       await db.execute('ALTER TABLE emotional_notes ADD COLUMN sentiment TEXT');
       await db.execute('ALTER TABLE behavior_patterns ADD COLUMN dayOfWeek TEXT DEFAULT "monday"');
       await db.execute('ALTER TABLE behavior_patterns ADD COLUMN sessionCount INTEGER DEFAULT 1');
       await db.execute('ALTER TABLE behavior_patterns ADD COLUMN featureUsed TEXT');
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+        CREATE TABLE gratitude_entries (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          content TEXT NOT NULL,
+          category TEXT,
+          createdAt TEXT NOT NULL
+        )
+      ''');
     }
   }
 
@@ -69,6 +79,15 @@ class DatabaseService {
         dayOfWeek TEXT NOT NULL,
         sessionCount INTEGER NOT NULL,
         featureUsed TEXT
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE gratitude_entries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT NOT NULL,
+        category TEXT,
+        createdAt TEXT NOT NULL
       )
     ''');
   }
@@ -147,6 +166,39 @@ class DatabaseService {
       orderBy: 'createdAt DESC',
     );
     return result.map((map) => EmotionalNote.fromMap(map)).toList();
+  }
+
+  Future<int> insertGratitudeEntry(GratitudeEntry entry) async {
+    final db = await database;
+    return await db.insert('gratitude_entries', entry.toMap());
+  }
+
+  Future<List<GratitudeEntry>> getGratitudeEntries({int days = 30}) async {
+    final db = await database;
+    final cutoff = DateTime.now().subtract(Duration(days: days)).toIso8601String();
+    final result = await db.query(
+      'gratitude_entries',
+      where: 'createdAt > ?',
+      whereArgs: [cutoff],
+      orderBy: 'createdAt DESC',
+    );
+    return result.map((map) => GratitudeEntry.fromMap(map)).toList();
+  }
+
+  Future<List<GratitudeEntry>> getGratitudeEntriesByCategory(String category) async {
+    final db = await database;
+    final result = await db.query(
+      'gratitude_entries',
+      where: 'category = ?',
+      whereArgs: [category],
+      orderBy: 'createdAt DESC',
+    );
+    return result.map((map) => GratitudeEntry.fromMap(map)).toList();
+  }
+
+  Future<int> deleteGratitudeEntry(int id) async {
+    final db = await database;
+    return await db.delete('gratitude_entries', where: 'id = ?', whereArgs: [id]);
   }
 
   Future close() async {
