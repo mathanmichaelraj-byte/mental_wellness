@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mental_wellness/screens/welcome_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'home_screen.dart';
 import '../utils/app_theme.dart';
 
+/// Pure loading / branding screen shown while the auth state is being
+/// resolved by [AuthWrapper].  It plays a scale + fade animation and does
+/// NOT perform any navigation itself — [AuthWrapper] handles all routing
+/// once the Firebase auth stream emits its first value.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -11,15 +12,19 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: Duration(milliseconds: 1500), vsync: this);
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
     _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
     );
@@ -27,27 +32,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
     _controller.forward();
-    _navigate();
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  Future<void> _navigate() async {
-    await Future.delayed(const Duration(seconds: 2));
-    final prefs = await SharedPreferences.getInstance();
-    final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
-    
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => onboardingComplete ? HomeScreen() : const WelcomeScreen(),
-        ),
-      );
-    }
   }
 
   @override
@@ -59,8 +49,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppTheme.primary.withOpacity(0.1),
-              AppTheme.success.withOpacity(0.05),
+              AppTheme.primary.withValues(alpha: 0.1),
+              AppTheme.success.withValues(alpha: 0.05),
               AppTheme.background(context),
             ],
           ),
@@ -81,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primary.withOpacity(0.4),
+                          color: AppTheme.primary.withValues(alpha: 0.4),
                           blurRadius: 30,
                           spreadRadius: 5,
                         ),
@@ -98,15 +88,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 Text(
                   'Mental Wellness',
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                        fontWeight: FontWeight.w700,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Your companion for emotional well-being',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppTheme.textSecondary(context),
-                  ),
+                        color: AppTheme.textSecondary(context),
+                      ),
                 ),
                 const SizedBox(height: 40),
                 SizedBox(
@@ -114,7 +104,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   height: 30,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation(AppTheme.primary),
+                    valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
                   ),
                 ),
               ],

@@ -201,6 +201,40 @@ class DatabaseService {
     return await db.delete('gratitude_entries', where: 'id = ?', whereArgs: [id]);
   }
 
+  /// Returns every [EmotionalNote] whose [createdAt] falls within today
+  /// (from 00:00:00 to 23:59:59 local time), ordered newest-first.
+  Future<List<EmotionalNote>> getTodayEmotionalNotes() async {
+    final db = await database;
+    final now = DateTime.now();
+    final startOfDay =
+        DateTime(now.year, now.month, now.day).toIso8601String();
+    final endOfDay =
+        DateTime(now.year, now.month, now.day, 23, 59, 59).toIso8601String();
+    final result = await db.query(
+      'emotional_notes',
+      where: 'createdAt >= ? AND createdAt <= ?',
+      whereArgs: [startOfDay, endOfDay],
+      orderBy: 'createdAt DESC',
+    );
+    return result.map((map) => EmotionalNote.fromMap(map)).toList();
+  }
+
+  /// Returns every [BehaviorPattern] whose [timestamp] falls within today
+  /// (from 00:00:00 local time), ordered newest-first.
+  Future<List<BehaviorPattern>> getTodayBehaviorPatterns() async {
+    final db = await database;
+    final now = DateTime.now();
+    final startOfDay =
+        DateTime(now.year, now.month, now.day).toIso8601String();
+    final result = await db.query(
+      'behavior_patterns',
+      where: 'timestamp >= ?',
+      whereArgs: [startOfDay],
+      orderBy: 'timestamp DESC',
+    );
+    return result.map((map) => BehaviorPattern.fromMap(map)).toList();
+  }
+
   Future close() async {
     final db = await database;
     db.close();
