@@ -12,12 +12,12 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/mood_history_screen.dart';
-import 'screens/emotional_release_screen.dart';
-import 'screens/calm_audio_screen.dart';
-import 'screens/location_finder_screen.dart';
-import 'screens/breathing_techniques_screen.dart';
-import 'screens/gratitude_screen.dart';
+import 'screens/quick_actions/mood_history_screen.dart';
+import 'screens/wellness_tools/emotional_release_screen.dart';
+import 'screens/wellness_tools/calm_audio_screen.dart';
+import 'screens/wellness_tools/location_finder_screen.dart';
+import 'screens/quick_actions/breathing_techniques_screen.dart';
+import 'screens/quick_actions/gratitude_screen.dart';
 import 'utils/app_theme.dart';
 
 Future<void> main() async {
@@ -103,6 +103,8 @@ class _MentalWellnessAppState extends State<MentalWellnessApp> with WidgetsBindi
           AppConstants.moodRoute: (context) => MoodHistoryScreen(),
           AppConstants.releaseRoute: (context) => EmotionalReleaseScreen(),
           AppConstants.audioRoute: (context) => CalmAudioScreen(),
+          AppConstants.journalRoute: (context) => EmotionalReleaseScreen(), // Reusing for now
+          AppConstants.affirmationsRoute: (context) => Placeholder(),
           AppConstants.locationRoute: (context) => LocationFinderScreen(),
           AppConstants.breathingRoute: (context) => BreathingTechniquesScreen(),
           AppConstants.gratitudeRoute: (context) => GratitudeScreen(),

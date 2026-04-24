@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../core/constants/app_constants.dart';
-import '../models/gratitude_entry.dart';
-import '../services/gratitude_service.dart';
-import '../services/behavior_tracker.dart';
-import '../utils/app_theme.dart';
+import '../../core/constants/app_constants.dart';
+import '../../models/gratitude_entry.dart';
+import '../../services/gratitude_service.dart';
+import '../../services/behavior_tracker.dart';
+import '../../utils/app_theme.dart';
 
 class GratitudeScreen extends StatefulWidget {
   const GratitudeScreen({super.key});

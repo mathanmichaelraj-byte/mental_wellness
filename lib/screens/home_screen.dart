@@ -503,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       {
         'icon': Icons.edit_note,
         'label': 'Journal',
-        'route': AppConstants.releaseRoute,
+        'route': AppConstants.journalRoute,
         'color': Colors.purple,
       },
       {
@@ -614,6 +614,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildWellnessTools(BuildContext context) {
     const tools = [
+      {
+        'icon': Icons.self_improvement,
+        'title': 'Affirmations',
+        'subtitle': 'Positive reminders',
+        'route': AppConstants.affirmationsRoute,
+        'gradient': [Colors.pink, Colors.red],
+      },
+      {
+        'icon': Icons.book,
+        'title': 'Emotional Release',
+        'subtitle': 'Express your feelings',
+        'route': AppConstants.releaseRoute,
+        'gradient': [Colors.blue, Colors.indigo],
+      },
       {
         'icon': Icons.music_note,
         'title': 'Calm Audio',

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../core/constants/app_constants.dart';
-import '../services/behavior_tracker.dart';
-import '../utils/app_theme.dart';
+import '../../core/constants/app_constants.dart';
+import '../../services/behavior_tracker.dart';
+import '../../utils/app_theme.dart';
 
 class BreathingTechnique {
   final String name;

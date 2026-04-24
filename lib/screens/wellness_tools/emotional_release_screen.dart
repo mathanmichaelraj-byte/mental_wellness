@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/emotional_note.dart';
-import '../services/database_service.dart';
-import '../services/behavior_tracker.dart';
-import '../utils/sentiment_analyzer.dart';
-import '../utils/app_theme.dart';
+import '../../models/emotional_note.dart';
+import '../../services/database_service.dart';
+import '../../services/behavior_tracker.dart';
+import '../../utils/sentiment_analyzer.dart';
+import '../../utils/app_theme.dart';
 
 class EmotionalReleaseScreen extends StatefulWidget {
   const EmotionalReleaseScreen({super.key});

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../services/emotional_inference_service.dart';
-import '../services/database_service.dart';
-import '../services/behavior_tracker.dart';
-import '../models/behavior_pattern.dart';
-import '../models/emotional_confidence.dart';
-import '../utils/app_theme.dart';
+import '../../services/emotional_inference_service.dart';
+import '../../services/database_service.dart';
+import '../../services/behavior_tracker.dart';
+import '../../models/behavior_pattern.dart';
+import '../../models/emotional_confidence.dart';
+import '../../utils/app_theme.dart';
 
 class MoodHistoryScreen extends StatefulWidget {
   const MoodHistoryScreen({super.key});
