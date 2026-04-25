@@ -63,8 +63,8 @@ lib/
 ├── services/             # Business logic
 │   └── firebase/         # Firebase services
 ├── utils/                # Helpers (theme, responsive)
-├── widgets/              # Reusable components
-│   └── onboarding/       # On Boarding Components
+└── widgets/              # Reusable components
+    └── onboarding/       # On Boarding Components
 ```
 
 ### Key Principles
