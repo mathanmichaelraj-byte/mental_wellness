@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:mental_wellness/core/constants/app_constants.dart';
-import 'package:mental_wellness/utils/app_theme.dart';
+import '../core/constants/app_constants.dart';
+import '../utils/app_theme.dart';
 
-/// Combined brand header widget used as the **fixed, non-scrolling** top
-/// section of [HomeScreen].
+/// Scrollable welcome card — displayed as the **first item** in the home
+/// screen's [SingleChildScrollView].
 ///
-/// It merges what was previously a separate [SliverAppBar] and the hero
-/// banner into a single gradient container that is pinned above the
-/// scrollable content.
+/// Shows:
+///  • Personalised greeting + username
+///  • Mood-aware affirmation of the day
+///  • Today's mood chip (tappable → MoodHistoryScreen)
 ///
-/// Parameters:
-///   [username]  – Display name of the signed-in user (nullable).
-///   [todayMood] – Map with a `'mood'` int key (0–4) when the user has data
-///                 for today, or `null` to show "Tap to log your mood".
-///   [actions]   – Icon buttons rendered at the trailing end of the brand row
-///                 (theme toggle, settings, help, logout, etc.).
-class HeroHeader extends StatelessWidget {
+/// The top app bar (brand + action icons) is now a separate pinned
+/// [AppBar] in [HomeScreen] and is NOT part of this widget.
+class HeroWelcomeCard extends StatelessWidget {
   final String? username;
-  final Map<String, dynamic>? todayMood;
-  final List<Widget> actions;
 
-  const HeroHeader({
+  /// Map with `'mood'` int key (0–4) when today's mood is known, else null.
+  final Map<String, dynamic>? todayMood;
+
+  /// The affirmation string to show — chosen by [HomeScreen] based on the
+  /// inferred [EmotionalState].
+  final String affirmation;
+
+  const HeroWelcomeCard({
     super.key,
     required this.username,
     required this.todayMood,
-    this.actions = const [],
+    required this.affirmation,
   });
 
-  // Mood labels / accent colours mapped by index 0-4
   static const List<Map<String, Object>> _moods = [
     {'label': 'Sad',     'color': Color(0xFFB0BEC5)},
     {'label': 'Anxious', 'color': Color(0xFFFFCC80)},
@@ -37,9 +38,9 @@ class HeroHeader extends StatelessWidget {
   ];
 
   String _greeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
+    final h = DateTime.now().hour;
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
     return 'Good evening';
   }
 
@@ -54,168 +55,144 @@ class HeroHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: AppTheme.gradientDeep,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(36),
-          bottomRight: Radius.circular(36),
-        ),
       ),
       child: Stack(
         children: [
-          // ── Decorative circles ─────────────────────────────────────────
-          Positioned(
-            top: -50, right: -40,
-            child: _circle(220, 0.07),
-          ),
-          Positioned(
-            bottom: -20, left: -50,
-            child: _circle(180, 0.05),
-          ),
-          Positioned(
-            top: 60, left: 20,
-            child: _circle(60, 0.06),
-          ),
-          // ── Main content ───────────────────────────────────────────────
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 8, 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Brand row — app icon + name + action buttons
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+          // Decorative circles
+          Positioned(top: -40, right: -30,  child: _circle(180, 0.07)),
+          Positioned(bottom: -20, left: -40, child: _circle(140, 0.05)),
+          Positioned(top: 50, left: 16,      child: _circle(50,  0.06)),
+
+          // Content
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Greeting
+                Text(
+                  username != null
+                      ? '${_greeting()},\n$username 👋'
+                      : 'Welcome back 👋',
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    height: 1.18,
+                    letterSpacing: -0.6,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Your space for emotional well-being',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withValues(alpha: 0.72),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Affirmation of the day
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.22)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // App icon
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.18),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.25),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.favorite_rounded,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
+                      Icon(Icons.format_quote_rounded,
+                          color: Colors.white.withValues(alpha: 0.7),
+                          size: 20),
                       const SizedBox(width: 10),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Mental Wellness',
+                          affirmation,
                           style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            letterSpacing: 0.3,
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.92),
+                            height: 1.5,
+                            fontStyle: FontStyle.italic,
                           ),
                         ),
                       ),
-                      // Action icon buttons from HomeScreen
-                      ...actions,
                     ],
                   ),
-                  const SizedBox(height: 20),
+                ),
+                const SizedBox(height: 16),
 
-                  // Greeting
-                  Text(
-                    username != null
-                        ? '${_greeting()},\n$username'
-                        : 'Welcome back',
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      height: 1.15,
-                      letterSpacing: -0.8,
+                // Today's mood chip
+                GestureDetector(
+                  onTap: () => Navigator.pushNamed(
+                      context, AppConstants.moodRoute),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.26)),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Your space for emotional well-being',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withValues(alpha: 0.78),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Frosted-glass mood card
-                  GestureDetector(
-                    onTap: () =>
-                        Navigator.pushNamed(context, AppConstants.moodRoute),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(AppTheme.radius),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.28),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "TODAY'S MOOD",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white.withValues(alpha: 0.65),
-                                    letterSpacing: 1.3,
-                                  ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "TODAY'S MOOD",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color:
+                                      Colors.white.withValues(alpha: 0.6),
+                                  letterSpacing: 1.2,
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  logged && mood != null
-                                      ? mood['label'] as String
-                                      : 'Tap to log your mood',
-                                  style: TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w700,
-                                    color: (logged && mood != null)
-                                        ? mood['color'] as Color
-                                        : Colors.white.withValues(alpha: 0.92),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
                               ),
-                            ),
-                            child: Icon(
-                              logged ? Icons.check_rounded : Icons.add_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+                              const SizedBox(height: 3),
+                              Text(
+                                logged && mood != null
+                                    ? mood['label'] as String
+                                    : 'Tap to log your mood',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: (logged && mood != null)
+                                      ? mood['color'] as Color
+                                      : Colors.white
+                                          .withValues(alpha: 0.9),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            logged
+                                ? Icons.check_rounded
+                                : Icons.add_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
