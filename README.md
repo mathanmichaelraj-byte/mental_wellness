@@ -57,11 +57,14 @@ lib/
 │   └── config/           # Configuration files
 ├── models/               # Data models
 ├── screens/              # UI screens
-│   └── auth/            # Authentication screens
+│   └── auth/             # Authentication screens
+│   ├── quick_actions/    # Quick Action Screens  
+│   └── wellness_tools/   # Wellness Tools Screen
 ├── services/             # Business logic
-│   └── firebase/        # Firebase services
+│   └── firebase/         # Firebase services
 ├── utils/                # Helpers (theme, responsive)
-└── widgets/              # Reusable components
+├── widgets/              # Reusable components
+│   └── onboarding/       # On Boarding Components
 ```
 
 ### Key Principles
