@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mental_wellness/services/affirmation_service.dart';
 import '../../core/constants/app_constants.dart';
 import '../../services/firebase/auth_service.dart';
-import '../../services/affirmation_service.dart';
 import '../../utils/app_theme.dart';
 
 class SignUpScreen extends StatefulWidget {

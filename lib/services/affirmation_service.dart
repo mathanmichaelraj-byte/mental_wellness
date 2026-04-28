@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mental_wellness/services/firebase/auth_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import '../core/constants/app_constants.dart';
-import 'firebase/auth_service.dart';
 
 class AffirmationService {
   static final AffirmationService instance = AffirmationService._init();

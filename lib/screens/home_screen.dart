@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mental_wellness/services/behavior_tracker.dart';
+import 'package:mental_wellness/services/emotional_inference_service.dart';
+import 'package:mental_wellness/services/mood_affirmation_service.dart';
+import 'package:mental_wellness/services/database_service.dart';
+import 'package:mental_wellness/services/onboarding_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/app_constants.dart';
-import '../services/database_service.dart';
-import '../services/emotional_inference_service.dart';
 import '../services/firebase/auth_service.dart';
-import '../services/mood_affirmation_service.dart';
-import '../services/behavior_tracker.dart';
-import '../services/onboarding_service.dart';
 import '../models/emotional_confidence.dart';
 import '../utils/app_theme.dart';
 import '../utils/hero_header.dart';
