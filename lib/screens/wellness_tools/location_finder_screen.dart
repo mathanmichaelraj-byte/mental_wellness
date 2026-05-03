@@ -3,8 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../services/location_service.dart';
-import '../../services/behavior_tracker.dart';
+import '../../services/location/location_service.dart';
+import '../../services/local/behavior_tracker.dart';
 import '../../utils/app_theme.dart';
 
 class LocationFinderScreen extends StatefulWidget {

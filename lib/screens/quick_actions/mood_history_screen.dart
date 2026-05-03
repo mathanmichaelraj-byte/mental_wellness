@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../services/emotional_inference_service.dart';
-import '../../services/database_service.dart';
-import '../../services/behavior_tracker.dart';
+import '../../services/inference/emotional_inference_service.dart';
+import '../../services/local/database_service.dart';
+import '../../services/local/behavior_tracker.dart';
 import '../../models/behavior_pattern.dart';
 import '../../models/emotional_confidence.dart';
 import '../../utils/app_theme.dart';

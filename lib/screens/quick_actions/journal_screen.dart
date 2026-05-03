@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/journal_entry.dart';
-import '../../services/database_service.dart';
+import '../../services/local/database_service.dart';
 import '../../utils/app_theme.dart';
 
 /// Full-featured permanent daily journal.

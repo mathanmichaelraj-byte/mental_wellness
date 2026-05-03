@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/onboarding_step.dart';
-import '../../services/onboarding_service.dart';
+import '../../services/onboarding/onboarding_service.dart';
 import 'onboarding_overlay.dart';
 
 class OnboardingManager {

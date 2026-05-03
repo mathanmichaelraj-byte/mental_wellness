@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/emotional_inference_service.dart';
-import '../services/mood_affirmation_service.dart';
+import '../services/inference/emotional_inference_service.dart';
+import '../services/inference/mood_affirmation_service.dart';
 import '../utils/app_theme.dart';
 
 /// Shows a one-time motivational popup when the user opens the app.

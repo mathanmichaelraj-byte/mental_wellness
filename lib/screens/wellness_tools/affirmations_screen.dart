@@ -1,6 +1,6 @@
 import '../../core/constants/app_constants.dart';
-import '../../services/emotional_inference_service.dart';
-import '../../services/mood_affirmation_service.dart';
+import '../../services/inference/emotional_inference_service.dart';
+import '../../services/inference/mood_affirmation_service.dart';
 import '../../utils/app_theme.dart';
 import 'package:flutter/material.dart';
 /// Browsable affirmations screen — shows all mood-appropriate affirmations
